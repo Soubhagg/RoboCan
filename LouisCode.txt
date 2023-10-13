@@ -1,1 +1,43 @@
 
+warning('off')
+axis([-1 1 -1 1 -1 1])
+hold on
+
+robot = UR3;
+baseTr = robot.model.fkine(robot.model.getpos).T*troty(pi);
+
+% GripperBase1 = GripperBase(baseTr);
+% GripperHand1 = GripperBase1.model.fkine(GripperBase1.model.getpos).T*transl(0,0.015,-0.06)*troty(pi/2);
+% GripperHand2 = GripperBase1.model.fkine(GripperBase1.model.getpos).T*trotz(pi)*transl(0,0.015,-0.06)*troty(pi/2);
+% LeftHand = GripperHand(GripperHand1);
+% RightHand = GripperHand(GripperHand2);
+
+q_open =  [1.1345,0,0.6213];
+q_close = [0.2356,0,1.5184];
+q_matrix = jtraj(q_open,q_close,200);
+Q2 = [-3*pi/2+2.9322,-1.2950,1.9652,-2.2410,-1.5708,-1.7802];
+q_matrix2 = jtraj(robot.model.getpos,Q2,200);
+LeftHand.model.delay = 0;
+RightHand.model.delay = 0;
+robot.model.delay = 0;
+GripperBase1.model.delay = 0;
+
+for i=1:200
+    GripperBase1.model.base = robot.model.fkine(robot.model.getpos).T*troty(pi);
+    LeftHand.model.base = GripperBase1.model.base.T*transl(0,0.015,-0.06)*troty(pi/2);
+    RightHand.model.base = GripperBase1.model.base.T*trotz(pi)*transl(0,0.015,-0.06)*troty(pi/2);
+    robot.model.animate(q_matrix2(i,:));
+
+    GripperBase1.model.animate(0);
+    LeftHand.model.animate(LeftHand.model.getpos);
+    RightHand.model.animate(RightHand.model.getpos);
+    
+    drawnow
+end
+for i = 1:200
+    LeftHand.model.animate(q_matrix(i,:));
+    RightHand.model.animate(q_matrix(i,:));
+    drawnow()
+end
+%%
+
