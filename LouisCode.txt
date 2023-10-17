@@ -1,23 +1,57 @@
-classdef Assignment2
-    properties(Access = public)
+classdef Assignment2 < handle
+    properties (Access = private)
         GripperBase1;LeftHand;RightHand;
-        robot;
+        robot;Can;Can_vert;Can_transf;
+        qDest = [];
+        qMatrix = [];matrix_signal;
+        collision_signal;gripper_signal;
+        object_pos;object_index;target_pos;
+        drop_signal;can_attached
+
     end
     methods
         function self = Assignment2()
+            %
+            close all
             warning('off')
             axis([-2 2 -2 2 -0.01 4])
             hold on
+
             self.robot = UR3(transl(0,0,1.5));
             baseTr = self.robot.model.fkine(self.robot.model.getpos).T*transl(0,0,-0.01)*troty(pi);
-
             self.GripperBase1 = GripperBase(baseTr);
             GripperHand1 = self.GripperBase1.model.fkine(self.GripperBase1.model.getpos).T*transl(0,0.015,-0.06)*troty(pi/2);
             GripperHand2 = self.GripperBase1.model.fkine(self.GripperBase1.model.getpos).T*trotz(pi)*transl(0,0.015,-0.06)*troty(pi/2);
             self.LeftHand = GripperHand(GripperHand1);
             self.RightHand = GripperHand(GripperHand2);
-            self.Add_models()
-            self.run()
+            self.Add_models
+            pause(2)
+
+
+            self.ProcessingWork
+        end
+        %% Working Process
+        function ProcessingWork(self)
+            for index = 1:2
+                switch index
+                    case 1
+                        self.object_index = 1;
+                        self.target_pos = self.object_pos{self.object_index};
+                        self.target_pos(1) = self.target_pos(1) - 0.15;
+                        self.matrix_signal = self.FindqMatrix;
+                        self.run
+                        self.gripper_signal = 0;
+                        self.GripperControl
+                        self.can_attached = true;
+                    case 2
+                        self.target_pos = [0,0.4,1.5];
+                        self.matrix_signal = self.FindqMatrix;
+                        self.run
+                        self.gripper_signal = 1;
+                        self.GripperControl
+                        self.can_attached = false;
+                end
+            end
         end
         %% Add table
         function Add_models(self)
@@ -27,41 +61,137 @@ classdef Assignment2
             set(Table,'Vertices',transformedVerticesT(:,1:3));
             % Add cans
 
-            Can1 = PlaceObject('Canbody.ply');
-            Can1_vertices = get(Can1,'Vertices');
-            Can1_transformedVerticesT = [Can1_vertices,ones(size(Can1_vertices,1),1)]*trotx(-pi/2)*transl(0.5,0,1.5)';
-            set(Can1,'Vertices',Can1_transformedVerticesT(:,1:3));
+            self.Can{1} = PlaceObject('Canbody2.ply');
+            self.Can_vert{1} = get(self.Can{1},'Vertices');
+            self.Can_transf{1} = [self.Can_vert{1},ones(size(self.Can_vert{1},1),1)]*trotx(-pi/2)*transl(0.5,0,1.5)';
+            set(self.Can{1},'Vertices',self.Can_transf{1}(:,1:3));
+            self.object_pos{1} = [0.5,0,1.5];
+
+            surf([-2,-2;2,2],[-2,2;-2,2],[0,0;0,0],'CData',imread('concrete.jpg'),'FaceColor','texturemap','FaceLighting','none');
+            surf([2,2;2,2],[-2,2;-2,2],[0,0;3,3],'CData',imread('Wall.jpg'),'FaceColor','texturemap');
+            surf([-2,2;-2,2],[2,2;2,2],[0,0;3,3],'CData',imread('Wall.jpg'),'FaceColor','texturemap');
 
         end
         %% Test Movement
         function run(self)
-            q_open =  [1.1345,0,0.6213];
-            q_close = [0.2356,0,1.5184];
-            q_matrix = jtraj(q_open,q_close,200);
-            Q2 = [-3.6827   -1.3967    2.2212   -0.8245    1.0295   -3.1417];
-            q_matrix2 = jtraj(self.robot.model.getpos,Q2,200);
-            self.LeftHand.model.delay = 0;
-            self.RightHand.model.delay = 0;
-            self.robot.model.delay = 0;
-            self.GripperBase1.model.delay = 0;
-            for i=1:200
-                self.GripperBase1.model.base = self.robot.model.fkine(self.robot.model.getpos).T*transl(0,0,-0.01)*troty(pi);
-                self.LeftHand.model.base = self.GripperBase1.model.base.T*transl(0,0.015,-0.06)*troty(pi/2);
-                self.RightHand.model.base = self.GripperBase1.model.base.T*trotz(pi)*transl(0,0.015,-0.06)*troty(pi/2);
-                self.robot.model.animate(q_matrix2(i,:));
+            if self.matrix_signal
+                self.LeftHand.model.delay = 0;
+                self.RightHand.model.delay = 0;
+                self.robot.model.delay = 0;
+                self.GripperBase1.model.delay = 0;
+                for i=1:size(self.qMatrix,1)
+                    self.GripperBase1.model.base = self.robot.model.fkine(self.robot.model.getpos).T*transl(0,0,-0.01)*troty(pi);
+                    self.LeftHand.model.base = self.GripperBase1.model.base.T*transl(0,0.015,-0.06)*troty(pi/2);
+                    self.RightHand.model.base = self.GripperBase1.model.base.T*trotz(pi)*transl(0,0.015,-0.06)*troty(pi/2);
+                    self.robot.model.animate(self.qMatrix(i,:));
 
-                self.GripperBase1.model.animate(0);
-                self.LeftHand.model.animate(self.LeftHand.model.getpos);
-                self.RightHand.model.animate(self.RightHand.model.getpos);
+                    self.GripperBase1.model.animate(0);
+                    self.LeftHand.model.animate(self.LeftHand.model.getpos);
+                    self.RightHand.model.animate(self.RightHand.model.getpos);
 
-                drawnow
-            end
-            for i = 1:200
-                self.LeftHand.model.animate(q_matrix(i,:));
-                self.RightHand.model.animate(q_matrix(i,:));
-                drawnow()
+                    if self.can_attached
+                        self.Can_transf{self.object_index} = [self.Can_vert{self.object_index},ones(size(self.Can_vert{self.object_index},1),1)]*trotz(pi/2)'*transl(0.12,0,-0.16)'*self.GripperBase1.model.base.T';
+                        set(self.Can{1},'Vertices',self.Can_transf{1}(:,1:3))
+                    end
+                    drawnow
+                end
             end
         end
+        %% Gripper Control
+        % Signal = 1: Open || Signal = 0: Close
+        function GripperControl(self)
+            q_open =  [1.1345,0,0.6213];
+            q_close = [0.6319, 0,1.1240];
+
+            if self.gripper_signal
+                q_gripper = jtraj(q_close,q_open,200);
+            else
+                q_gripper = jtraj(q_open,q_close,200);
+            end
+            for i = 1:200
+                self.LeftHand.model.animate(q_gripper(i,:));
+                self.RightHand.model.animate(q_gripper(i,:));
+                drawnow
+            end
+        end
+        %%
+        function result = FindqMatrix(self)
+            cur_object = self.target_pos;
+            Q_destination{1} = transl(cur_object(1),cur_object(2),cur_object(3)+0.2)*trotx(-pi/2)*troty(pi/2)*trotz(-pi/2);
+            Q_destination{2} = transl(cur_object(1),cur_object(2),cur_object(3)+0.12)*trotx(-pi/2)*troty(pi/2)*trotz(-pi/2);
+            count = 1;
+            Q{1}=[];
+            Q{2}=[];
+            Q_iniguest = [[2.7806   -0.6561    1.7146    2.0831   -1.2098   -1.5708]...
+                ;[1.5708   -2.0384   -0.7854    2.8170   -2.8798   -1.5708]...
+                ;[1.5708   -2.0384   -0.7854    5.9586   -4.7648   -1.5708]...
+                ;[1.5708   -0.0105   -0.5341    0.5411   -4.7124   -1.5708]...
+                ;[3.0788   -0.8901   -0.5341    1.4347   -4.7822   -1.5708]...
+                ;[3.0788   -0.8901   -0.5341    1.4347   -1.6406   -1.5708]...
+                ;randn(94,6)];
+            while count < 101
+                Q{1} = self.robot.model.ikine(Q_destination{1},'q0',Q_iniguest(count,:),'mask',[1 1 1 1 1 1],'forceSln');
+                Q{2} = self.robot.model.ikine(Q_destination{2},'q0',Q_iniguest(count,:),'mask',[1 1 1 1 1 1],'forceSln');
+                count = count + 1;
+                if ~size(Q{1},1) || ~size(Q{2},1)
+                    result = 0;
+                else
+                    result = 1;
+                end
+
+                if result
+                    for index = 1:2
+                        for i= 1:6
+                            a = fix(Q{index}(i)/(pi));
+                            if (a<-1 || a>1)
+                                Q{index}(i) = Q{index}(i) - a*2*pi;
+                            end
+                        end
+                    end
+                    self.qMatrix = [jtraj(self.robot.model.getpos,Q{1},200); jtraj(Q{1},Q{2},200)];
+                    self.collision_signal = self.CheckCollision;
+                    if self.collision_signal
+                        self.qMatrix = [];
+                    else
+                        break
+                    end
+                end
+            end
+        end
+        %%
+        function result = CheckCollision(self)
+            result = 0;
+            for qIndex = 1:size(self.qMatrix,1)
+
+                % Get the transform of every joint (i.e. start and end of every link)
+                tr = GetLinkPoses(self.qMatrix(qIndex,:), self);
+                % Go through each link and also each triangle face
+                for i = 2 : size(tr,3)-1
+                    vertOnPlane = [0,0,1.55];
+                    faceNormals = [0,0,1];
+                    [~,check] = LinePlaneIntersection(faceNormals,vertOnPlane,tr(1:3,4,i)',tr(1:3,4,i+1)');
+                    if check == 1
+                        result = result + 1;
+                    end
+                end
+            end
+        end
+        %%
+        function [ transforms ] = GetLinkPoses(q,self)
+            links = self.robot.model.links;
+            transforms = zeros(4, 4, length(links) + 1);
+            transforms(:,:,1) = self.robot.model.base;
+
+            for i = 1:length(links)
+                L = links(1,i);
+
+                current_transform = transforms(:,:, i);
+
+                current_transform = current_transform * trotz(q(1,i) + L.offset) * ...
+                    transl(0,0, L.d) * transl(L.a,0,0) * trotx(L.alpha);
+                transforms(:,:,i + 1) = current_transform;
+            end
+        end
+
     end
 end
-
