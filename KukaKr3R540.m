@@ -1,4 +1,4 @@
-classdef UR3 < RobotBaseClass
+classdef KukaKr3R540 < RobotBaseClass
     %% KUKA KR3 R540 payload robot model
     %
     % WARNING: This model has been created by UTS students in the subject
