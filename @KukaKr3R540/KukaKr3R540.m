@@ -36,12 +36,12 @@ classdef KukaKr3R540 < RobotBaseClass
 
 %% CreateModel
         function CreateModel(self)
-            link(1) = Link('d',-345, 'a',-20, 'alpha',-pi/2, 'offset',      pi/2, 'qlim',[-170*pi/180 170*pi/180]);
-            link(2) = Link('d',   0, 'a',260, 'alpha',    0, 'offset',        pi, 'qlim',[-170*pi/180  50*pi/180]);
-            link(3) = Link('d',   0, 'a', 20, 'alpha', pi/2, 'offset',     -pi/2, 'qlim',[-110*pi/180 155*pi/180]);
-            link(4) = Link('d',-260, 'a',  0, 'alpha',-pi/2, 'offset',-80*pi/180, 'qlim',[-175*pi/180 175*pi/180]);
+            link(1) = Link('d',0.345, 'a',0.020, 'alpha',-pi/2, 'offset',      pi/2, 'qlim',[-170*pi/180 170*pi/180]);
+            link(2) = Link('d',   0, 'a',-0.260, 'alpha',    0, 'offset',        pi, 'qlim',[-170*pi/180  50*pi/180]);
+            link(3) = Link('d',   0, 'a', -0.020, 'alpha', pi/2, 'offset',     -pi/2, 'qlim',[-110*pi/180 155*pi/180]);
+            link(4) = Link('d',0.260, 'a',  0, 'alpha',-pi/2, 'offset',-80*pi/180, 'qlim',[-175*pi/180 175*pi/180]);
             link(5) = Link('d',   0, 'a',  0, 'alpha', pi/2, 'offset',         0, 'qlim',[-120*pi/180 120*pi/180]);
-            link(6) = Link('d', -75, 'a',  0, 'alpha',   pi, 'offset',        pi, 'qlim',[-350*pi/180 350*pi/180]);
+            link(6) = Link('d', 0.075, 'a',  0, 'alpha',   pi, 'offset',        pi, 'qlim',[-350*pi/180 350*pi/180]);
              
             self.model = SerialLink(link,'name',self.name);
         end      
