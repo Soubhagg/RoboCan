@@ -12,7 +12,7 @@ classdef KukaKr3R540 < RobotBaseClass
     
     methods
 %% Constructor
-        function self = KukaKr3(baseTr,useTool,toolFilename)
+        function self = KukaKr3R540(baseTr,useTool,toolFilename)
             if nargin < 3
                 if nargin == 2
                     error('If you set useTool you must pass in the toolFilename as well');
@@ -36,12 +36,12 @@ classdef KukaKr3R540 < RobotBaseClass
 
 %% CreateModel
         function CreateModel(self)
-            link(1) = Link('d',0.129, 'a', 0.002, 'alpha', -pi/2, 'offset', 0, 'qlim',[deg2rad(-170), deg2rad(170)]);
-            link(2) = Link('d',0, 'a', 0.345-0.129, 'alpha', 0, 'offset', 0, 'qlim',[deg2rad(-170), deg2rad(50)]);
-            link(3) = Link('d',0, 'a', 0.280, 'alpha', -pi/2, 'offset', 0, 'qlim',[deg2rad(-110), deg2rad(155)]);
-            link(4) = Link('d',0.260-0.152, 'a',0, 'alpha', pi/2, 'offset', 0, 'qlim',[deg2rad(-175), deg2rad(175)]);
-            link(5) = Link('d',0, 'a', 0.260-0.152, 'alpha',-pi/2 , 'offset', 0, 'qlim',[deg2rad(-120), deg2rad(120)]);
-            link(6) = Link('d',0.075, 'a', 0, 'alpha',pi/2, 'offset', 0, 'qlim',[deg2rad(-350), deg2rad(350)]);
+            link(1) = Link('d',-345, 'a',-20, 'alpha',-pi/2, 'offset',      pi/2, 'qlim',[-170*pi/180 170*pi/180]);
+            link(2) = Link('d',   0, 'a',260, 'alpha',    0, 'offset',        pi, 'qlim',[-170*pi/180  50*pi/180]);
+            link(3) = Link('d',   0, 'a', 20, 'alpha', pi/2, 'offset',     -pi/2, 'qlim',[-110*pi/180 155*pi/180]);
+            link(4) = Link('d',-260, 'a',  0, 'alpha',-pi/2, 'offset',-80*pi/180, 'qlim',[-175*pi/180 175*pi/180]);
+            link(5) = Link('d',   0, 'a',  0, 'alpha', pi/2, 'offset',         0, 'qlim',[-120*pi/180 120*pi/180]);
+            link(6) = Link('d', -75, 'a',  0, 'alpha',   pi, 'offset',        pi, 'qlim',[-350*pi/180 350*pi/180]);
              
             self.model = SerialLink(link,'name',self.name);
         end      
