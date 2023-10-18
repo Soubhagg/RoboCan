@@ -12,7 +12,7 @@ classdef KukaKr3R540 < RobotBaseClass
     
     methods
 %% Constructor
-        function self = KukaKr3(baseTr,useTool,toolFilename)
+        function self = KukaKr3R540(baseTr,useTool,toolFilename)
             if nargin < 3
                 if nargin == 2
                     error('If you set useTool you must pass in the toolFilename as well');
