@@ -23,7 +23,8 @@ classdef Assignment2 < handle
             baseTr = self.robot.model.fkine(self.robot.model.getpos).T*transl(0,0,-0.01)*troty(pi);
             self.GripperBase1 = GripperBase(baseTr);
             GripperHand1 = self.GripperBase1.model.fkine(self.GripperBase1.model.getpos).T*transl(0,0.015,-0.06)*troty(pi/2);
-            GripperHand2 = self.GripperBase1.model.fkine(self.GripperBase1.model.getpos).T*trotz(pi)*transl(0,0.015,-0.06)*troty(pi/2);
+            GripperHand2 = 
+self.GripperBase1.model.fkine(self.GripperBase1.model.getpos).T*trotz(pi)*transl(0,0.015,-0.06)*troty(pi/2);
             self.LeftHand = GripperHand(GripperHand1);
             self.RightHand = GripperHand(GripperHand2);
             self.Add_models
