@@ -1,7 +1,7 @@
 classdef Assignment2 < handle
     properties (Access = private)
         GripperBase1;LeftHand;RightHand;
-        robot;Can;Can_vert;Can_transf;
+        robot,robot2;Can;Can_vert;Can_transf;Cap;Cap_vert;Cap_transf;
         qDest = [];
         qMatrix = [];matrix_signal;
         collision_signal;gripper_signal;
@@ -14,20 +14,20 @@ classdef Assignment2 < handle
     end
     methods (Access = public)
         function self = Assignment2()
-            %
+            close all
             warning('off')
             self.RunGUI
         end
         %% Working Process
         function ProcessingWork(self)
             fprintf('Start Working Process! \n ... ... ... \n ... ... ... \n ')
-            self.destination_pos = {[-0.4,0.2,1.5];[-0.4,0,1.5];[-0.4,-0.2,1.5];[0,0.3,1.6]};
+            self.destination_pos = {[-0.4,0,1.5];[-0.4,0,1.5];[-0.4,0,1.5];[0,0.3,1.6]};
             for index = self.cur_state:size(self.destination_pos,1)
                 self.object_index = index;
-                for step = self.cur_step:2
+                for step = self.cur_step:3
                     cases = step;
                     if index == size(self.destination_pos,1)
-                        cases = 3;
+                        cases = 4;
                     end
 
                     switch cases
@@ -45,10 +45,16 @@ classdef Assignment2 < handle
                             self.matrix_signal = self.FindqMatrix;
                             self.can_attached = true;
                             self.run
+                            self.OpenCap
+                        case 3
+                            self.target_pos = [-0.4 + index*0.2,-0.35,1.5];
+                            self.target_ori = trotx(-pi/2)*troty(pi)*trotz(-pi/2);
+                            self.matrix_signal = self.FindqMatrix;
+                            self.run
                             self.gripper_signal = 1;
                             self.GripperControl
                             self.can_attached = false;
-                        case 3
+                        case 4
                             self.target_pos = self.destination_pos{index};
                             self.target_ori = trotx(-pi/2)*trotz(-pi/2);
                             self.matrix_signal = self.FindqMatrix;
@@ -76,12 +82,18 @@ classdef Assignment2 < handle
             set(Table,'Vertices',transformedVerticesT(:,1:3));
             % Add cans
 
-            self.object_pos = {[0.4,0.3,1.5];[0.4,0,1.5];[0.4,-0.3,1.5]};
+            self.object_pos = {[0.4,0.3,1.5];[0.5,0,1.5];[0.35,-0.3,1.5]};
+            objectCap_pos = {[0.4,0.3,1.66];[0.5,0,1.66];[0.35,-0.3,1.66]};
             for index = 1: size(self.object_pos,1)
-                self.Can{index} = PlaceObject('Canbody2.ply');
+                self.Can{index} = PlaceObject('Canbody.ply');
                 self.Can_vert{index} = get(self.Can{index},'Vertices');
                 self.Can_transf{index} = [self.Can_vert{index},ones(size(self.Can_vert{index},1),1)]*trotx(-pi/2)*transl(self.object_pos{index})';
                 set(self.Can{index},'Vertices',self.Can_transf{index}(:,1:3));
+
+                self.Cap{index} = PlaceObject('CanCap.ply');
+                self.Cap_vert{index} = get(self.Cap{index},'Vertices');
+                self.Cap_transf{index} = [self.Cap_vert{index},ones(size(self.Cap_vert{index},1),1)]*trotx(-pi/2)*transl(objectCap_pos{index})';
+                set(self.Cap{index},'Vertices',self.Cap_transf{index}(:,1:3));
             end
 
             surf([-2,-2;2,2],[-2,2;-2,2],[0,0;0,0],'CData',imread('concrete.jpg'),'FaceColor','texturemap','FaceLighting','none');
@@ -110,8 +122,12 @@ classdef Assignment2 < handle
                     self.RightHand.model.animate(self.RightHand.model.getpos);
 
                     if self.can_attached
-                        self.Can_transf{self.object_index} = [self.Can_vert{self.object_index},ones(size(self.Can_vert{self.object_index},1),1)]*trotz(pi/2)'*transl(0.12,0,-0.16)'*self.GripperBase1.model.base.T';
+                        self.Can_transf{self.object_index} = [self.Can_vert{self.object_index},ones(size(self.Can_vert{self.object_index},1),1)]*trotz(pi/2)'*transl(0.06,0,-0.16)'*self.GripperBase1.model.base.T';
                         set(self.Can{self.object_index},'Vertices',self.Can_transf{self.object_index}(:,1:3))
+                        if self.Cap{self.object_index}
+                            self.Cap_transf{self.object_index} = [self.Cap_vert{self.object_index},ones(size(self.Cap_vert{self.object_index},1),1)]*trotz(pi/2)'*transl(-0.1,0,-0.16)'*self.GripperBase1.model.base.T';
+                            set(self.Cap{self.object_index},'Vertices',self.Cap_transf{self.object_index}(:,1:3))
+                        end
                     end
                     drawnow
                 end
@@ -143,11 +159,11 @@ classdef Assignment2 < handle
             cur_object = self.target_pos;
             cur_pos = self.robot.model.fkine(self.robot.model.getpos).T;
             if (cur_pos(3,4) - 1.5) < 0.2
-                cur_pos(3,4) = cur_pos(3,4) + 0.15;
+                cur_pos(3,4) = cur_pos(3,4) + 0.2;
             end
             Q_destination{2} = cur_pos;
             Q_destination{3} = transl(cur_object(1),cur_object(2),cur_object(3)+0.3)*self.target_ori;
-            Q_destination{4} = transl(cur_object(1),cur_object(2),cur_object(3)+0.12)*self.target_ori;
+            Q_destination{4} = transl(cur_object(1),cur_object(2),cur_object(3)+0.06)*self.target_ori;
             Q{1}=self.robot.model.getpos;
             Q{2}=[];
             Q{3}=[];
@@ -197,16 +213,41 @@ classdef Assignment2 < handle
                 end
             end
         end
+        %% Open Cap
+        function OpenCap(self)
+            q_matrix{1} = jtraj([-1.5708   -0.8659    0.8196   -1.7454   -1.6171    0.4636],[-1.5708   -0.4598    1.5083   -1.7461   -0.5224    0],200);
+            q_matrix{2} = [repmat([-1.5708   -0.4598    1.5083   -1.7461   -0.5224],200,1),[0:8*pi/199:8*pi]'];
+            q_matrix{3} = jtraj([-1.5708   -0.4598    1.5083   -1.7461   -0.5224    8*pi],[-1.5708   -0.8659    0.8196   -1.7454   -1.6171    8*pi],200);
+            q_matrix{4} = jtraj([-1.5708   -0.8659    0.8196   -1.7454   -1.6171    8*pi],[0   -0.8659    0.8196   -1.7454   -1.6171    8*pi],200);
+            q_matrix{5} = jtraj([0   -0.8659    0.8196   -1.7454   -1.6171    8*pi],[-1.5708   -0.8659    0.8196   -1.7454   -1.6171    8*pi],200);
+            
+            q_cap = [repmat([-0.8,0.4473],200,1),[2:-(0.51-self.object_index*0.01)/199:(1.49+self.object_index*0.01)]'];
+            for index = 1:5
+
+                for i = 1:200
+                    if index == 3 || index == 4
+                        self.Cap_transf{self.object_index} = [self.Cap_vert{self.object_index},ones(size(self.Cap_vert{self.object_index},1),1)]*trotx(pi/2)'*self.robot2.model.fkine(self.robot2.model.getpos).T';
+                        set(self.Cap{self.object_index},'Vertices',self.Cap_transf{self.object_index}(:,1:3))
+                    elseif index == 5
+                        self.Cap_transf{self.object_index} = [self.Cap_vert{self.object_index},ones(size(self.Cap_vert{self.object_index},1),1)]*trotx(-pi/2)*transl(q_cap(i,:))';
+                        set(self.Cap{self.object_index},'Vertices',self.Cap_transf{self.object_index}(:,1:3));
+                    end
+                    self.robot2.model.animate(q_matrix{index}(i,:))
+                    drawnow
+                end
+            end
+            self.Cap{self.object_index} = 0;
+        end
         %%
         function result = CheckCollision(self)
             result = 0;
             for qIndex = 1:size(self.qMatrix,1)
-
-                % Get the transform of every joint (i.e. start and end of every link)
+                % Get the transform of every joint and gripper (i.e. start and end of every link)
                 tr = GetLinkPoses(self.qMatrix(qIndex,:), self);
+                tr(:,:,end+1) = self.robot.model.fkine(self.qMatrix(qIndex,:)).T*transl(0,0,0.15);
                 % Go through each link and also each triangle face
                 for i = 2 : size(tr,3)-1
-                    vertOnPlane = [0,0,1.55];
+                    vertOnPlane = [0,0,1.51];
                     faceNormals = [0,0,1];
                     [~,check] = LinePlaneIntersection(faceNormals,vertOnPlane,tr(1:3,4,i)',tr(1:3,4,i+1)');
                     if check == 1
@@ -289,9 +330,10 @@ classdef Assignment2 < handle
                     self.handles.pb4.String = "Logging into the system";
                     figure('Position',[900 70 900 900])
                     axis([-2 2 -2 2 -0.01 4])
-                    view(-13,14)
+                    view(15,25)
                     hold on
                     self.robot = UR3(transl(0,0,1.5));
+                    self.robot2 = KukaKr3R540(transl(-0.95,0,1.5));
                     baseTr = self.robot.model.fkine(self.robot.model.getpos).T*transl(0,0,-0.01)*troty(pi);
                     self.GripperBase1 = GripperBase(baseTr);
                     GripperHand1 = self.GripperBase1.model.fkine(self.GripperBase1.model.getpos).T*transl(0,0.015,-0.06)*troty(pi/2);
@@ -332,7 +374,6 @@ classdef Assignment2 < handle
                 self.handles.sb6 = uislider(self.handles.fig2,"Position",[77 117 327 7],"Limits",[-2*pi 2*pi]);
                 self.handles.sb6.Value = cur_q(6);
 
-
                 self.handles.sb7 = uispinner(self.handles.fig2,"Position",[448 344 67 30],"ValueDisplayFormat", '%.2f',"Step",0.02);
                 self.handles.sb7.Value = cur_pos(1,4);
                 self.handles.sb8 = uispinner(self.handles.fig2,"Position",[448 279 67 30],"ValueDisplayFormat", '%.2f',"Step",0.02);
@@ -348,7 +389,6 @@ classdef Assignment2 < handle
 
                 self.handles.sb13 = uicontrol(self.handles.fig2,'style','pushbutton','position',[44 22 116 35],'callback',@updatepose_cb,'string','Joints');
                 self.handles.sb14 = uicontrol(self.handles.fig2,'style','pushbutton','position',[270 22 116 35],'callback',@updatepose2_cb,'string','Cartesian');
-                self.handles.sb15 = uicontrol(self.handles.fig2,'style','pushbutton','position',[450 416 62 42],'string','Close');
 
                 self.handles.lb1 = uilabel(self.handles.fig2,"Position",[6 355 46 22],"Text",'Joint 1');
                 self.handles.lb2 = uilabel(self.handles.fig2,"Position",[6 305 46 22],"Text",'Joint 2');
@@ -366,35 +406,38 @@ classdef Assignment2 < handle
             end
 
             function updatepose_cb(~,~)
-                for i = 1:2
-                    self.qMatrix = [self.handles.sb1.Value,self.handles.sb2.Value,self.handles.sb3.Value,self.handles.sb4.Value,self.handles.sb5.Value,self.handles.sb6.Value];
+                q_end = [self.handles.sb1.Value,self.handles.sb2.Value,self.handles.sb3.Value,self.handles.sb4.Value,self.handles.sb5.Value,self.handles.sb6.Value];
+                self.qMatrix = jtraj(self.robot.model.getpos,q_end,200);
+                result = self.CheckCollision;
+                if ~result
                     self.matrix_signal = true;
                     self.run;
                     cur_pos = self.robot.model.fkine(self.robot.model.getpos).T;
                     cur_ori = tr2rpy(cur_pos,'deg','xyz');
+                    self.handles.sb7.Value = cur_pos(1,4);
+                    self.handles.sb8.Value = cur_pos(2,4);
+                    self.handles.sb9.Value = cur_pos(3,4);
+                    self.handles.sb10.Value = cur_ori(1);
+                    self.handles.sb11.Value = cur_ori(2);
+                    self.handles.sb12.Value = cur_ori(3);
+                    A{1,1} = sprintf('x = %0.2f, y = %0.2f, z= %0.2f',cur_pos(1,4),cur_pos(2,4),cur_pos(3,4));
+                    A{1,2} = sprintf('R= %0.2f, P= %0.2f, Y=%0.2f',cur_ori(1),cur_ori(2),cur_ori(3));
+                    self.handles.sb0.String = {A{1,1},newline,A{1,2}};
+                else
+                    self.handles.sb0.String = {'Cant reach this pose';newline;'Please Change Your Option!'};
                 end
-                self.handles.sb7.Value = cur_pos(1,4);
-                self.handles.sb8.Value = cur_pos(2,4);
-                self.handles.sb9.Value = cur_pos(3,4);
-                self.handles.sb10.Value = cur_ori(1);
-                self.handles.sb11.Value = cur_ori(2);
-                self.handles.sb12.Value = cur_ori(3);
-
-                A{1,1} = sprintf('x = %0.2f, y = %0.2f, z= %0.2f',cur_pos(1,4),cur_pos(2,4),cur_pos(3,4));
-                A{1,2} = sprintf('R= %0.2f, P= %0.2f, Y=%0.2f',cur_ori(1),cur_ori(2),cur_ori(3));
-                self.handles.sb0.String = {A{1,1},newline,A{1,2}};
             end
 
             function updatepose2_cb(~,~)
                 self.target_pos = transl(self.handles.sb7.Value,self.handles.sb8.Value,self.handles.sb9.Value);
-                self.target_ori = trotx(self.handles.sb10.Value)*troty(self.handles.sb11.Value)*trotz(self.handles.sb12.Value);
+                self.target_ori = trotx(self.handles.sb10.Value*pi/180)*troty(self.handles.sb11.Value*pi/180)*trotz(self.handles.sb12.Value*pi/180);
                 self.handles.sb0.String = 'Calculating ... ... Pls Wait';
                 pause(0.5)
-                Q_iniguest = load("Initial_guest_Optimized.m");
-                for count = 1 : size(Q_iniguest,1)
-                    q = self.robot.model.ikine(self.target_pos*self.target_ori,'q0',Q_iniguest(count,:),'mask',[1 1 1 1 1 1],'forceSln');
-                    if size(q,1)
-                        break
+                q = self.robot.model.ikcon(self.target_pos*self.target_ori);
+                for i= 1:6
+                    a = q(i)/(pi);
+                    if (a<-1 || a>1)
+                        q(i) = q(i) - fix(a)*2*pi;
                     end
                 end
                 if ~size(q,1)
