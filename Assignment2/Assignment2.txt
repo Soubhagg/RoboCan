@@ -220,7 +220,7 @@ classdef Assignment2 < handle
             q_matrix{3} = jtraj([-1.5708   -0.4598    1.5083   -1.7461   -0.5224    8*pi],[-1.5708   -0.8659    0.8196   -1.7454   -1.6171    8*pi],200);
             q_matrix{4} = jtraj([-1.5708   -0.8659    0.8196   -1.7454   -1.6171    8*pi],[0   -0.8659    0.8196   -1.7454   -1.6171    8*pi],200);
             q_matrix{5} = jtraj([0   -0.8659    0.8196   -1.7454   -1.6171    8*pi],[-1.5708   -0.8659    0.8196   -1.7454   -1.6171    8*pi],200);
-            
+
             q_cap = [repmat([-0.8,0.4473],200,1),[2:-(0.51-self.object_index*0.01)/199:(1.49+self.object_index*0.01)]'];
             for index = 1:5
 
@@ -403,12 +403,14 @@ classdef Assignment2 < handle
                 self.handles.lb11 = uilabel(self.handles.fig2,"Position",[424 88 17 22],"Text",'P',"HorizontalAlignment",'center');
                 self.handles.lb12 = uilabel(self.handles.fig2,"Position",[424 23 17 22],"Text",'Y',"HorizontalAlignment",'center');
 
+                VRcontrol();
             end
 
             function updatepose_cb(~,~)
                 q_end = [self.handles.sb1.Value,self.handles.sb2.Value,self.handles.sb3.Value,self.handles.sb4.Value,self.handles.sb5.Value,self.handles.sb6.Value];
-                self.qMatrix = jtraj(self.robot.model.getpos,q_end,200);
+                self.qMatrix = jtraj(self.robot.model.getpos,q_end,50);
                 result = self.CheckCollision;
+                result =false;
                 if ~result
                     self.matrix_signal = true;
                     self.run;
@@ -433,16 +435,23 @@ classdef Assignment2 < handle
                 self.target_ori = trotx(self.handles.sb10.Value*pi/180)*troty(self.handles.sb11.Value*pi/180)*trotz(self.handles.sb12.Value*pi/180);
                 self.handles.sb0.String = 'Calculating ... ... Pls Wait';
                 pause(0.5)
-                q = self.robot.model.ikcon(self.target_pos*self.target_ori);
-                for i= 1:6
-                    a = q(i)/(pi);
-                    if (a<-1 || a>1)
-                        q(i) = q(i) - fix(a)*2*pi;
+                Q_ini = load("Initial_guest_Optimized.m");
+                for i = 1 : size(Q_ini,1)
+                    q = self.robot.model.ikine(self.target_pos*self.target_ori,'q0',Q_ini(i,:),'mask',[1 1 1 1 1 1],'ForceSln');
+                    if size(q,1)
+                        break
                     end
                 end
+                q
                 if ~size(q,1)
                     self.handles.sb0.String = {'Cant reach this pose';newline;'Please Change Your Option!'};
                 else
+                    for i= 1:6
+                        a = q(i)/(pi);
+                        if (a<-1 || a>1)
+                            q(i) = q(i) - fix(a)*2*pi;
+                        end
+                    end
                     self.handles.sb1.Value = q(1);
                     self.handles.sb2.Value = q(2);
                     self.handles.sb3.Value = q(3);
@@ -452,6 +461,64 @@ classdef Assignment2 < handle
                     updatepose_cb
                 end
 
+            end
+
+            function VRcontrol(~,~)
+                %% setup joystick
+                id = 1; % NOTE: may need to change if multiple joysticks present
+
+                joy = vrjoystick(id);
+                [~, buttons, ~] = read(joy);
+                self.handles.buttons = buttons;
+                %%
+                while(1)
+                    % Read joystick buttons
+
+                    [~, buttons, ~] = read(joy);
+                    self.handles.buttons = buttons;
+                    if self.handles.buttons(1)
+                        self.handles.sb1.Value = self.handles.sb1.Value +0.1;
+                        updatepose_cb;
+                    elseif self.handles.buttons(2)
+                        self.handles.sb1.Value = self.handles.sb1.Value -0.1;
+                        updatepose_cb;
+                    elseif self.handles.buttons(3)
+                        self.handles.sb2.Value = self.handles.sb2.Value +0.1;
+                        updatepose_cb;
+                    elseif self.handles.buttons(4)
+                        self.handles.sb2.Value = self.handles.sb2.Value -0.1;
+                        updatepose_cb;
+                    elseif self.handles.buttons(5)
+                        self.handles.sb3.Value = self.handles.sb3.Value +0.1;
+                        updatepose_cb;
+                    elseif self.handles.buttons(6)
+                        self.handles.sb3.Value = self.handles.sb3.Value -0.1;
+                        updatepose_cb;
+                    elseif self.handles.buttons(8)
+                        self.handles.sb4.Value = self.handles.sb4.Value +0.1;
+                        updatepose_cb;
+                    elseif self.handles.buttons(9)
+                        self.handles.sb4.Value = self.handles.sb4.Value -0.1;
+                        updatepose_cb;
+                    elseif self.handles.buttons(10)
+                        self.handles.sb5.Value = self.handles.sb5.Value +0.1;
+                        updatepose_cb;
+                    elseif self.handles.buttons(11)
+                        self.handles.sb5.Value = self.handles.sb5.Value -0.1;
+                        updatepose_cb;
+                    elseif self.handles.buttons(12)
+                        self.handles.sb6.Value = self.handles.sb6.Value +0.1;
+                        updatepose_cb;
+                    elseif self.handles.buttons(13)
+                        self.handles.sb6.Value = self.handles.sb6.Value -0.1;
+                        updatepose_cb;
+                    end
+
+                    pause(0.05);
+                    if buttons(7)
+                        break
+                    end
+                end
             end
         end
     end
