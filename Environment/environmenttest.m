@@ -21,6 +21,7 @@ Table = PlaceObject('counter.ply');
 Table_vertices = get(Table,'Vertices');
 transformedVerticesT = [Table_vertices,ones(size(Table_vertices,1),1)]*troty(-pi/2)'*transl(0,0,0)';
 set(Table,'Vertices',transformedVerticesT(:,1:3));
+axis equal
 hold on
 
 BarrierLocations = [
