@@ -17,6 +17,16 @@
 
 close all
 
+%% Walls %%
+
+surf([-6,-6;6,6],[-4,4;-4,4],[0,0;0,0],'CData',imread('Floor.jpg'),'FaceColor','texturemap','FaceLighting','none');
+hold on
+surf([6,6;6,6],[-4,4;-4,4],[0,0;3,3],'CData',imread('Wall.jpg'),'FaceColor','texturemap');
+hold on
+surf([-6,6;-6,6],[4,4;4,4],[0,0;3,3],'CData',imread('Wall.jpg'),'FaceColor','texturemap');
+hold on
+
+
 Table = PlaceObject('counter.ply');
 Table_vertices = get(Table,'Vertices');
 transformedVerticesT = [Table_vertices,ones(size(Table_vertices,1),1)]*troty(-pi/2)'*transl(0,0,0)';
@@ -30,10 +40,10 @@ BarrierLocations = [
     0,-0.249625,1.5935
     0,0.00075,1.5935
     0,0.251125,1.5935
-    -1.0015,-0.5,1.5935
-    -1.0015,-0.249625,1.5935
-    -1.0015,0.00075,1.5935
-    -1.0015,0.251125,1.5935
+    -2.003,-0.5,1.5935
+    -2.003,-0.249625,1.5935
+    -2.003,0.00075,1.5935
+    -2.003,0.251125,1.5935
 ];
 
 BarrierLocations2 = [
@@ -41,10 +51,18 @@ BarrierLocations2 = [
     0,-0.249625,1.5935
     0,0.00075,1.5935
     0,0.251125,1.5935
-    -1.0015,-0.5,1.5935
-    -1.0015,-0.249625,1.5935
-    -1.0015,0.00075,1.5935
-    -1.0015,0.251125,1.5935
+    0,0.5015,1.5935
+    0,0.751875,1.5935
+    0,1.00225,1.5935
+    0,1.252625,1.5935
+    -2.003,-0.5,1.5935
+    -2.003,-0.249625,1.5935
+    -2.003,0.00075,1.5935
+    -2.003,0.251125,1.5935
+    -2.003,0.5015,1.5935
+    -2.003,0.751875,1.5935
+    -2.003,1.00225,1.5935
+    -2.003,1.252625,1.5935
 ];
 
 BarrierPlacement = PlaceObject('Barrier.ply',[BarrierLocations; BarrierLocations2]);
@@ -56,7 +74,7 @@ angle = -pi/2;
 BarrierPlacementIndices = size(BarrierLocations, 1) + 1:size(BarrierLocations, 1) + size(BarrierLocations2, 1);
 for i = BarrierPlacementIndices
     BarrierVertices = get(BarrierPlacement(i), 'Vertices');
-    rotatedVertices = (transl(-0.44,-0.542114,0)*trotz(angle) * [BarrierVertices, ones(size(BarrierVertices, 1), 1)]').';
+    rotatedVertices = (transl(-1.428,-0.542114,0)*trotz(angle) * [BarrierVertices, ones(size(BarrierVertices, 1), 1)]').';
     set(BarrierPlacement(i), 'Vertices', rotatedVertices(:, 1:3));
 end
 
