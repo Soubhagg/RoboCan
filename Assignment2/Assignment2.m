@@ -272,7 +272,7 @@ classdef Assignment2 < handle
                 ;jtraj([0,-0.8659,0.8196,-1.7454,-1.6171,8*pi],[-1.5708,-0.8659,0.8196,-1.7454,-1.6171,8*pi],200)};
 
             q_cap = [repmat([-0.8,0.4473],200,1),[2:-(0.51-self.object_index*0.01)/199:(1.49+self.object_index*0.01)]'];
-
+            if ~self.stop_signal
             for index = 1:5
                 for i = 1:200
                     if index == 3 || index == 4
@@ -285,6 +285,7 @@ classdef Assignment2 < handle
                     self.robot2.model.animate(q_matrix{index}(i,:))
                     drawnow
                 end
+            end
             end
             self.Cap{self.object_index} = 0;
         end
@@ -380,7 +381,7 @@ classdef Assignment2 < handle
                     self.robot = UR3(transl(0,0,1.5));
                     self.robot2 = KukaKr3R540(transl(-0.95,0,1.5));
                     baseTr = self.robot.model.fkine(self.robot.model.getpos).T*transl(0,0,-0.01)*troty(pi);
-                    self.GripperBase0 = GripperBase0(baseTr);
+                    self.GripperBase0 = GripperBase(baseTr);
                     GripperHand1 = self.GripperBase0.model.fkine(self.GripperBase0.model.getpos).T*transl(0,0.015,-0.06)*troty(pi/2);
                     GripperHand2 = self.GripperBase0.model.fkine(self.GripperBase0.model.getpos).T*trotz(pi)*transl(0,0.015,-0.06)*troty(pi/2);
                     self.LeftHand = GripperHand(GripperHand1);
