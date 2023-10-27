@@ -17,6 +17,16 @@
 
 close all
 
+%% Walls %%
+
+surf([-6,-6;6,6],[-4,4;-4,4],[0,0;0,0],'CData',imread('Floor.jpg'),'FaceColor','texturemap','FaceLighting','none');
+hold on
+surf([6,6;6,6],[-4,4;-4,4],[0,0;3,3],'CData',imread('Wall.jpg'),'FaceColor','texturemap');
+hold on
+surf([-6,6;-6,6],[4,4;4,4],[0,0;3,3],'CData',imread('Wall.jpg'),'FaceColor','texturemap');
+hold on
+
+
 Table = PlaceObject('counter.ply');
 Table_vertices = get(Table,'Vertices');
 transformedVerticesT = [Table_vertices,ones(size(Table_vertices,1),1)]*troty(-pi/2)'*transl(0,0,0)';
