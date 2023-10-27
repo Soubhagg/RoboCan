@@ -26,7 +26,6 @@ hold on
 surf([-6,6;-6,6],[4,4;4,4],[0,0;3,3],'CData',imread('Wall.jpg'),'FaceColor','texturemap');
 hold on
 
-
 Table = PlaceObject('counter.ply');
 Table_vertices = get(Table,'Vertices');
 transformedVerticesT = [Table_vertices,ones(size(Table_vertices,1),1)]*troty(-pi/2)'*transl(0,0,0)';
@@ -57,13 +56,24 @@ BarrierLocations2 = [
     0,1.252625,1.5935
 ];
 
-BarrierPlacement = PlaceObject('Barrier.ply',[BarrierLocations; BarrierLocations2]);
+BarrierLocations3 = [
+    -1.0015,-0.5,1.5935
+    -1.0015,-0.249625,1.5935
+    -1.0015,0.00075,1.5935
+    -1.0015,0.251125,1.5935
+    -1.0015,0.5015,1.5935
+    -1.0015,0.751875,1.5935
+    -1.0015,1.00225,1.5935
+    -1.0015,1.252625,1.5935
+];
+
+BarrierPlacement = PlaceObject('Barrier.ply',[BarrierLocations; BarrierLocations2; BarrierLocations3]);
 
 % Define the rotation angle in radians (90 degrees)
 angle = -pi/2;
 
 % Use troty to rotate only BarrierLocations2
-BarrierPlacementIndices = size(BarrierLocations, 1) + 1:size(BarrierLocations, 1) + size(BarrierLocations2, 1);
+BarrierPlacementIndices = size(BarrierLocations, 1) + 1:size(BarrierLocations, 1) + size(BarrierLocations2, 1)+size(BarrierLocations3,1);
 for i = BarrierPlacementIndices
     BarrierVertices = get(BarrierPlacement(i), 'Vertices');
     rotatedVertices = (transl(-1.428,-0.542114,0)*trotz(angle) * [BarrierVertices, ones(size(BarrierVertices, 1), 1)]').';
