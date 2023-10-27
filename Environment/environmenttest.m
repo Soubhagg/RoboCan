@@ -23,7 +23,7 @@ surf([-6,-6;6,6],[-4,4;-4,4],[0,0;0,0],'CData',imread('Floor.jpg'),'FaceColor','
 hold on
 surf([6,6;6,6],[-4,4;-4,4],[0,0;3,3],'CData',imread('Wall.jpg'),'FaceColor','texturemap');
 hold on
-surf([-6,6;-6,6],[4,4;4,4],[0,0;3,3],'CData',imread('Wall.jpg'),'FaceColor','texturemap');
+surf([-6,6;-6,6],[4,4;4,4],[3,3;0,0],'CData',imread('WallWW.jpg'),'FaceColor','texturemap');
 hold on
 
 Table = PlaceObject('enlargedcounter.ply');
