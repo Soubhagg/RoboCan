@@ -55,14 +55,6 @@ BarrierLocations2 = [
     0,0.751875,1.5935
     0,1.00225,1.5935
     0,1.252625,1.5935
-    -2.003,-0.5,1.5935
-    -2.003,-0.249625,1.5935
-    -2.003,0.00075,1.5935
-    -2.003,0.251125,1.5935
-    -2.003,0.5015,1.5935
-    -2.003,0.751875,1.5935
-    -2.003,1.00225,1.5935
-    -2.003,1.252625,1.5935
 ];
 
 BarrierPlacement = PlaceObject('Barrier.ply',[BarrierLocations; BarrierLocations2]);
@@ -82,6 +74,12 @@ Estop = PlaceObject('emergencyStopButton.ply');
 Estop_vertices = get(Estop,'Vertices');
 transformedVerticesE = [Estop_vertices,ones(size(Estop_vertices,1),1)]*transl(1.5,-0.4,1.5)';
 set(Estop,'Vertices',transformedVerticesE(:,1:3));
+
+personLocation = [0,-2,0];
+personPlacement = PlaceObject('personModified.ply',personLocation);
+
+fireExtLocation = [1.7,0.25,1.5];
+fireExtPlacement = PlaceObject('fireExtinguisher.ply',fireExtLocation);
 
 % barrier_pos1 = [
 % 0,-0.5,1.5935
