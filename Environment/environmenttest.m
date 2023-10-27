@@ -13,8 +13,8 @@
         % handles;                                                           % Information Storage for the GUI
         % cur_state;cur_step;                                                % Indicate the current stage and step
         % smart_feature;    
+        % Barrier;Barrier_vert;Barrier_transf
 
-        % Barrier;Barrier_vert;Barrier_transf;
 close all
 
 Table = PlaceObject('counter.ply');
@@ -22,6 +22,7 @@ Table_vertices = get(Table,'Vertices');
 transformedVerticesT = [Table_vertices,ones(size(Table_vertices,1),1)]*troty(-pi/2)'*transl(0,0,0)';
 set(Table,'Vertices',transformedVerticesT(:,1:3));
 hold on
+axis equal
 
 BarrierLocations = [
     0,-0.5,1.5935
@@ -35,13 +36,14 @@ BarrierLocations = [
 ];
 
 BarrierLocations2 = [
-    % -0.125, -0.5, 1.5935
-    % -0.375375, -0.5, 1.5935
-    % -0.62575, -0.5, 1.5935
     0,-0.5,1.5935
     0,-0.249625,1.5935
     0,0.00075,1.5935
     0,0.251125,1.5935
+    -1.0015,-0.5,1.5935
+    -1.0015,-0.249625,1.5935
+    -1.0015,0.00075,1.5935
+    -1.0015,0.251125,1.5935
 ];
 
 BarrierPlacement = PlaceObject('Barrier.ply',[BarrierLocations; BarrierLocations2]);
