@@ -35,18 +35,18 @@ hold on
 axis equal
 
 BarrierLocations = [
-    0, -0.750375, 1.5935
-    0,-0.5,1.5935
-    0,-0.249625,1.5935
-    0,0.00075,1.5935
-    0,0.251125,1.5935
-    0,0.5015 ,1.5935
-    -2.003, -0.750375, 1.5935
-    -2.003,-0.5,1.5935
-    -2.003,-0.249625,1.5935
-    -2.003,0.00075,1.5935
-    -2.003,0.251125,1.5935
-    -2.003,0.5015 ,1.5935
+    1, -0.750375, 1.5935
+    1,-0.5,1.5935
+    1,-0.249625,1.5935
+    1,0.00075,1.5935
+    1,0.251125,1.5935
+    1,0.5015 ,1.5935
+    -2.24267, -0.750375, 1.5935
+    -2.24267,-0.5,1.5935
+    -2.24267,-0.249625,1.5935
+    -2.24267,0.00075,1.5935
+    -2.24267,0.251125,1.5935
+    -2.24267,0.5015 ,1.5935
 ];
 
 
@@ -59,6 +59,11 @@ BarrierLocations2 = [
     0.250375,0.751875,1.5935
     0.250375,1.00225,1.5935
     0.250375,1.252625,1.5935
+    0.250375,1.503,1.5935
+    0.250375,1.753375,1.5935
+    0.250375,2.00375,1.5935
+    0.250375,2.254125,1.5935
+    0.250375,2.5045,1.5935
 ];
     
 BarrierLocations3 = [
@@ -70,6 +75,11 @@ BarrierLocations3 = [
     -1.251875,0.751875,1.5935
     -1.251875,1.00225,1.5935
     -1.251875,1.252625,1.5935
+    -1.251875,1.503,1.5935
+    -1.251875,1.753375,1.5935
+    -1.251875,2.00375,1.5935
+    -1.251875,2.254125,1.5935
+    -1.251875,2.5045,1.5935
 ];
 
 BarrierPlacement = PlaceObject('Barrier.ply',[BarrierLocations; BarrierLocations2; BarrierLocations3]);
@@ -81,13 +91,13 @@ angle = -pi/2;
 BarrierPlacementIndices = size(BarrierLocations, 1) + 1:size(BarrierLocations, 1) + size(BarrierLocations2, 1)+size(BarrierLocations3,1);
 for i = BarrierPlacementIndices
     BarrierVertices = get(BarrierPlacement(i), 'Vertices');
-    rotatedVertices = (transl(-1.428,-0.542114,0)*trotz(angle) * [BarrierVertices, ones(size(BarrierVertices, 1), 1)]').';
+    rotatedVertices = (transl(-1.68699,-0.542114,0)*trotz(angle) * [BarrierVertices, ones(size(BarrierVertices, 1), 1)]').';
     set(BarrierPlacement(i), 'Vertices', rotatedVertices(:, 1:3));
 end
 
 Estop = PlaceObject('emergencyStopButton.ply');
 Estop_vertices = get(Estop,'Vertices');
-transformedVerticesE = [Estop_vertices,ones(size(Estop_vertices,1),1)]*transl(1.5,-0.4,1.5)';
+transformedVerticesE = [Estop_vertices,ones(size(Estop_vertices,1),1)]*transl(2.5,-0.4,1.5)';
 set(Estop,'Vertices',transformedVerticesE(:,1:3));
 
 personLocation = [0,-2,0];
