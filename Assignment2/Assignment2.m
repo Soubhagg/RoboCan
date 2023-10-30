@@ -24,10 +24,92 @@ classdef Assignment2 < handle
         %% Create Working Environment and Add Models
         % (description)
         function Add_models(self)
-            Table = PlaceObject('Table.ply');
+            surf([-6,-6;6,6],[-4,4;-4,4],[0,0;0,0],'CData',imread('Floor.jpg'),'FaceColor','texturemap','FaceLighting','none');
+            hold on
+            surf([6,6;6,6],[-4,4;-4,4],[0,0;3,3],'CData',imread('Wall.jpg'),'FaceColor','texturemap');
+            hold on
+            surf([-6,6;-6,6],[4,4;4,4],[3,3;0,0],'CData',imread('WallWW.jpg'),'FaceColor','texturemap');
+            hold on
+
+            Table = PlaceObject('enlargedcounter.ply');
             Table_vertices = get(Table,'Vertices');
-            transformedVerticesT = [Table_vertices,ones(size(Table_vertices,1),1)]*troty(-pi/2)'*transl(0,0,1.4)';
+            transformedVerticesT = [Table_vertices,ones(size(Table_vertices,1),1)]*troty(-pi/2)'*transl(0,0,0)';
             set(Table,'Vertices',transformedVerticesT(:,1:3));
+            axis equal
+            hold on
+            axis equal
+
+            BarrierLocations = [
+                1, -0.750375, 1.5935
+                1,-0.5,1.5935
+                1,-0.249625,1.5935
+                1,0.00075,1.5935
+                1,0.251125,1.5935
+                1,0.5015 ,1.5935
+                -2.24267, -0.750375, 1.5935
+                -2.24267,-0.5,1.5935
+                -2.24267,-0.249625,1.5935
+                -2.24267,0.00075,1.5935
+                -2.24267,0.251125,1.5935
+                -2.24267,0.5015 ,1.5935
+                ];
+
+
+            BarrierLocations2 = [
+                0.250375,-0.5,1.5935
+                0.250375,-0.249625,1.5935
+                0.250375,0.00075,1.5935
+                0.250375,0.251125,1.5935
+                0.250375,0.5015,1.5935
+                0.250375,0.751875,1.5935
+                0.250375,1.00225,1.5935
+                0.250375,1.252625,1.5935
+                0.250375,1.503,1.5935
+                0.250375,1.753375,1.5935
+                0.250375,2.00375,1.5935
+                0.250375,2.254125,1.5935
+                0.250375,2.5045,1.5935
+                ];
+
+            BarrierLocations3 = [
+                -1.251875,-0.5,1.5935
+                -1.251875,-0.249625,1.5935
+                -1.251875,0.00075,1.5935
+                -1.251875,0.251125,1.5935
+                -1.251875,0.5015,1.5935
+                -1.251875,0.751875,1.5935
+                -1.251875,1.00225,1.5935
+                -1.251875,1.252625,1.5935
+                -1.251875,1.503,1.5935
+                -1.251875,1.753375,1.5935
+                -1.251875,2.00375,1.5935
+                -1.251875,2.254125,1.5935
+                -1.251875,2.5045,1.5935
+                ];
+
+            BarrierPlacement = PlaceObject('Barrier.ply',[BarrierLocations; BarrierLocations2; BarrierLocations3]);
+
+            % Define the rotation angle in radians (90 degrees)
+            angle = -pi/2;
+
+            % Use troty to rotate only BarrierLocations2
+            BarrierPlacementIndices = size(BarrierLocations, 1) + 1:size(BarrierLocations, 1) + size(BarrierLocations2, 1)+size(BarrierLocations3,1);
+            for i = BarrierPlacementIndices
+                BarrierVertices = get(BarrierPlacement(i), 'Vertices');
+                rotatedVertices = (transl(-1.68699,-0.542114,0)*trotz(angle) * [BarrierVertices, ones(size(BarrierVertices, 1), 1)]').';
+                set(BarrierPlacement(i), 'Vertices', rotatedVertices(:, 1:3));
+            end
+
+            Estop = PlaceObject('emergencyStopButton.ply');
+            Estop_vertices = get(Estop,'Vertices');
+            transformedVerticesE = [Estop_vertices,ones(size(Estop_vertices,1),1)]*transl(2.5,-0.4,1.5)';
+            set(Estop,'Vertices',transformedVerticesE(:,1:3));
+
+            personLocation = [0,-2,0];
+            personPlacement = PlaceObject('personModified.ply',personLocation);
+
+            fireExtLocation = [1.7,0.25,1.5];
+            fireExtPlacement = PlaceObject('fireExtinguisher.ply',fireExtLocation);
 
             self.object_pos = {[0.4,0.3,1.5];[0.5,0,1.5];[0.35,-0.3,1.5]};
             objectCap_pos = {[0.4,0.3,1.66];[0.5,0,1.66];[0.35,-0.3,1.66]};
@@ -42,10 +124,6 @@ classdef Assignment2 < handle
                 self.Cap_transf{index} = [self.Cap_vert{index},ones(size(self.Cap_vert{index},1),1)]*trotx(-pi/2)*transl(objectCap_pos{index})';
                 set(self.Cap{index},'Vertices',self.Cap_transf{index}(:,1:3));
             end
-
-            surf([-2,-2;2,2],[-2,2;-2,2],[0,0;0,0],'CData',imread('concrete.jpg'),'FaceColor','texturemap','FaceLighting','none');
-            surf([2,2;2,2],[-2,2;-2,2],[0,0;3,3],'CData',imread('Wall.jpg'),'FaceColor','texturemap');
-            surf([-2,2;-2,2],[2,2;2,2],[0,0;3,3],'CData',imread('Wall.jpg'),'FaceColor','texturemap');
 
         end
         %% The Main Predefined Working Process
@@ -273,19 +351,19 @@ classdef Assignment2 < handle
 
             q_cap = [repmat([-0.8,0.4473],200,1),[2:-(0.51-self.object_index*0.01)/199:(1.49+self.object_index*0.01)]'];
             if ~self.stop_signal
-            for index = 1:5
-                for i = 1:200
-                    if index == 3 || index == 4
-                        self.Cap_transf{self.object_index} = [self.Cap_vert{self.object_index},ones(size(self.Cap_vert{self.object_index},1),1)]*trotx(pi/2)'*self.robot2.model.fkine(self.robot2.model.getpos).T';
-                        set(self.Cap{self.object_index},'Vertices',self.Cap_transf{self.object_index}(:,1:3))
-                    elseif index == 5
-                        self.Cap_transf{self.object_index} = [self.Cap_vert{self.object_index},ones(size(self.Cap_vert{self.object_index},1),1)]*trotx(-pi/2)*transl(q_cap(i,:))';
-                        set(self.Cap{self.object_index},'Vertices',self.Cap_transf{self.object_index}(:,1:3));
+                for index = 1:5
+                    for i = 1:200
+                        if index == 3 || index == 4
+                            self.Cap_transf{self.object_index} = [self.Cap_vert{self.object_index},ones(size(self.Cap_vert{self.object_index},1),1)]*trotx(pi/2)'*self.robot2.model.fkine(self.robot2.model.getpos).T';
+                            set(self.Cap{self.object_index},'Vertices',self.Cap_transf{self.object_index}(:,1:3))
+                        elseif index == 5
+                            self.Cap_transf{self.object_index} = [self.Cap_vert{self.object_index},ones(size(self.Cap_vert{self.object_index},1),1)]*trotx(-pi/2)*transl(q_cap(i,:))';
+                            set(self.Cap{self.object_index},'Vertices',self.Cap_transf{self.object_index}(:,1:3));
+                        end
+                        self.robot2.model.animate(q_matrix{index}(i,:))
+                        drawnow
                     end
-                    self.robot2.model.animate(q_matrix{index}(i,:))
-                    drawnow
                 end
-            end
             end
             self.Cap{self.object_index} = 0;
         end
@@ -367,7 +445,7 @@ classdef Assignment2 < handle
                     self.handles.pb4.String = "Disengaging the E-stop button first!";
                 end
             end
-            
+
             % Login to the environment - Create Robot and add environment.
             function login_cb(~,~)
                 if self.handles.pb0.Value
@@ -375,7 +453,7 @@ classdef Assignment2 < handle
                     pause(1.5)
                     self.handles.pb4.String = "Logging into the system";
                     figure('Position',[900 70 900 900])
-                    axis([-2 2 -2 2 -0.01 4])
+                    axis([-6 6 -4 4 -0.01 3])
                     view(15,25)
                     hold on
                     self.robot = UR3(transl(0,0,1.5));
@@ -399,7 +477,7 @@ classdef Assignment2 < handle
                     close(self.handles.fig)
                 end
             end
-            
+
             % Open the control GUI for the robot UR3
             % It includes 6 joints stages and Cartesian values
             % (x,y,z,Y,P,R)
@@ -453,11 +531,11 @@ classdef Assignment2 < handle
                 self.handles.lb12 = uilabel(self.handles.fig2,"Position",[424 23 17 22],"Text",'Y',"HorizontalAlignment",'center');
                 VRcontrol();
             end
-            
+
             % Animate the robot based on the joints stage modification.
             function updatepose_cb(~,~)
                 q_end = [self.handles.sb1.Value,self.handles.sb2.Value,self.handles.sb3.Value,self.handles.sb4.Value,self.handles.sb5.Value,self.handles.sb6.Value];
-                self.qMatrix = jtraj(self.robot.model.getpos,q_end,10);
+                self.qMatrix = jtraj(self.robot.model.getpos,q_end,5);
                 result = self.CheckCollision;
                 result =false;
                 if ~result
