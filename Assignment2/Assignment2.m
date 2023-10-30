@@ -401,7 +401,7 @@ classdef Assignment2 < handle
         function RunGUI(self)
             self.handles.fig = uifigure('Name','Can-Can Robot','position',[80 250 524 472]);
             self.handles.pb0 = uiswitch(self.handles.fig,'toggle','Position',[45 385 20 45],'Items',{'Off','On'},'Value',0,'ValueChangedFcn',@login_cb,'ItemsData',{0,1});
-            self.handles.pb1 = uicontrol(self.handles.fig,'style','togglebutton','position',[35 179 108 41],'callback',@stop_cb,'string','Stop');
+            self.handles.pb1 = uicontrol(self.handles.fig,'style','togglebutton','position',[35 179 108 41],'callback',@stop_cb,'string','Stop','BackgroundColor',[1 0 0]);
             self.handles.pb2 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 249 108 41],'callback',@resume_cb,'string','Run');
             self.handles.pb3 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 109 108 41],'callback',@logout_cb,'string','Log out');
             self.handles.pb4 = uicontrol(self.handles.fig,'style','edit','position',[111 333 304 118],'HorizontalAlignment','center','FontSize',14,'Value',1,'BackgroundColor','k');
