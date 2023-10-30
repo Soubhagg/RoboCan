@@ -26,14 +26,14 @@ classdef Assignment2 < handle
         function Add_models(self)
             surf([-6,-6;6,6],[-4,4;-4,4],[0,0;0,0],'CData',imread('Floor.jpg'),'FaceColor','texturemap','FaceLighting','none');
             hold on
-            surf([6,6;6,6],[-4,4;-4,4],[0,0;3,3],'CData',imread('Wall.jpg'),'FaceColor','texturemap');
+            surf([6,6;6,6],[-4,4;-4,4],[0,0;3.5,3.5],'CData',imread('Wall.jpg'),'FaceColor','texturemap');
             hold on
-            surf([-6,6;-6,6],[4,4;4,4],[3,3;0,0],'CData',imread('WallWW.jpg'),'FaceColor','texturemap');
+            surf([-6,6;-6,6],[4,4;4,4],[3.5,3.5;0,0],'CData',imread('WallWW.jpg'),'FaceColor','texturemap');
             hold on
 
-            Table = PlaceObject('enlargedcounter.ply');
+            Table = PlaceObject('NewCounter.ply');
             Table_vertices = get(Table,'Vertices');
-            transformedVerticesT = [Table_vertices,ones(size(Table_vertices,1),1)]*troty(-pi/2)'*transl(0,0,0)';
+            transformedVerticesT = [Table_vertices,ones(size(Table_vertices,1),1)]*troty(-pi/2)'*transl(0,0,-0.1)';
             set(Table,'Vertices',transformedVerticesT(:,1:3));
             axis equal
             hold on
