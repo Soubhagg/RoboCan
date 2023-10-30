@@ -111,8 +111,8 @@ classdef Assignment2 < handle
             fireExtLocation = [1.7,0.25,1.5];
             fireExtPlacement = PlaceObject('fireExtinguisher.ply',fireExtLocation);
 
-            self.object_pos = {[0.4,0.3,1.5];[0.5,0,1.5];[0.35,-0.3,1.5]};
-            objectCap_pos = {[0.4,0.3,1.66];[0.5,0,1.66];[0.35,-0.3,1.66]};
+            self.object_pos = {[0.4,0.3,1.5];[0.5,0,1.5]};
+            objectCap_pos = {[0.4,0.3,1.66];[0.5,0,1.66]};
             for index = 1: size(self.object_pos,1)
                 self.Can{index} = PlaceObject('Canbody.ply');
                 self.Can_vert{index} = get(self.Can{index},'Vertices');
