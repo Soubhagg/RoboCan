@@ -26,6 +26,7 @@ classdef KukaKr3R540 < RobotBaseClass
                 self.toolFilename = [toolFilename,'.ply'];
             end
           
+            self.homeQ = [-1.5708,-0.8659,0.8196,-1.7454,-1.6171,0.4636];
             self.CreateModel();
 			self.model.base = self.model.base.T * baseTr;
             self.model.tool = self.toolTr;

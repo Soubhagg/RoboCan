@@ -16,7 +16,7 @@ end
 % Display the image and recognized text
 figure
 imshow(canInfo)
-text(600, 150, recognizedText, 'BackgroundColor', [1 1 1]);
+text(1500, 150, recognizedText, 'BackgroundColor', [1 1 1]);
 
 
 % Initialize variables to store nutritional information

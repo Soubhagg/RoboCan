@@ -110,8 +110,8 @@ classdef Assignment2 < handle
             fireExtLocation = [1.7,0.25,1.5];
             fireExtPlacement = PlaceObject('fireExtinguisher.ply',fireExtLocation);
 
-            self.object_pos = {[0.4,0.3,1.5];[0.5,0,1.5];[0.35,0.2,1.5]};
-            objectCap_pos = {[0.4,0.3,1.66];[0.5,0,1.66];[0.35,0.2,1.66]};
+            self.object_pos = {[0.35,0.3,1.5];[0.5,0,1.5];[0.35,-0.2,1.5]};
+            objectCap_pos = {[0.35,0.3,1.66];[0.5,0,1.66];[0.35,-0.2,1.66]};
             for index = 1: size(self.object_pos,1)
                 self.Can{index} = PlaceObject('Canbody.ply');
                 self.Can_vert{index} = get(self.Can{index},'Vertices');
@@ -132,7 +132,7 @@ classdef Assignment2 < handle
 
         function ProcessingWork(self)
             fprintf('Start Working Process! \n ... ... ... \n ... ... ... \n ')
-            self.destination_pos = {[-0.4,0,1.5];[-0.4,0,1.5];[-0.4,0,1.5];[0,0.3,1.6]};                        % The robot will go through each Can (defined as each stage)
+            % The robot will go through each Can (defined as each stage)
             for index = self.cur_state:size(self.destination_pos,1)                                             % Each stage include 3 main step:
                 self.object_index = index;                                                                      %  1) Go to the Can location, close the gripper and pick the Can up.
                 for step = self.cur_step:3                                                                      %  2) Move it to the Kuka location. And wait for the Kuka to open the Cap.
@@ -359,7 +359,7 @@ classdef Assignment2 < handle
                             self.Cap_transf{self.object_index} = [self.Cap_vert{self.object_index},ones(size(self.Cap_vert{self.object_index},1),1)]*trotx(-pi/2)*transl(q_cap(i,:))';
                             set(self.Cap{self.object_index},'Vertices',self.Cap_transf{self.object_index}(:,1:3));
                         end
-                        if self.stop_signal 
+                        if self.stop_signal
                             break
                         end
                         self.robot2.model.animate(q_matrix{index}(i,:))
@@ -368,7 +368,7 @@ classdef Assignment2 < handle
                 end
                 self.Cap{self.object_index} = 0;
             end
-            
+
         end
 
         %% Create Link Poses
@@ -410,6 +410,10 @@ classdef Assignment2 < handle
             self.handles.pb4 = uicontrol(self.handles.fig,'style','edit','position',[111 333 304 118],'HorizontalAlignment','center','FontSize',14,'Value',1,'BackgroundColor','k');
             self.handles.pb5 = uilamp(self.handles.fig,'Color','r','Position',[449 405 46 46]);
             self.handles.pb6 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 109 108 41],'callback',@control_cb,'string','Control Mode');
+            self.handles.pb7 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 249 108 41],'callback',@options,'string','Fish','Tag','f','BackgroundColor',[0.56,0.02,0.02]);
+            self.handles.pb8 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 179 108 41],'callback',@options,'string','Beef','Tag','b','BackgroundColor',[0.20,0.93,0.98]);
+            self.handles.pb9 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 109 108 41],'callback',@options,'string','Pork','Tag','p','BackgroundColor',[0.87,0.90,0.90]);
+
             guidata(self.handles.fig,self.handles);
 
             % Stop function sends signal to the system if being pushed
@@ -468,7 +472,8 @@ classdef Assignment2 < handle
                     self.LeftHand = GripperHand(GripperHand1);
                     self.RightHand = GripperHand(GripperHand2);
                     self.Add_models
-                    self.handles.pb4.String ="Press The Run Button To Start";
+                    self.destination_pos = {[-0.4,0,1.5];[-0.4,0,1.5];[-0.4,0,1.5];[0,0.3,1.6]};
+                    self.handles.pb4.String ="Hi!What would you like to eat?";
                     pause(2)
                 else
                     logout_cb
@@ -479,6 +484,27 @@ classdef Assignment2 < handle
                     pause(1.5)
                     close(self.handles.fig)
                 end
+            end
+
+            %Change the destination location based on option
+            function options(src,~)
+                self.cur_step = 1;
+                switch src.Tag
+                    case char('f')
+                        self.cur_state = 1;
+                        self.destination_pos = {[-0.4,0,1.5];[0,0.3,1.6]};
+                        self.handles.pb4.String ="Fish Can!";
+                    case char('b')
+                        self.cur_state = 2;
+                        self.destination_pos = {[-0.4,0,1.5];[-0.4,0,1.5];[0,0.3,1.6]};
+                        self.handles.pb4.String ="Beef Can!";
+                    case char('p')
+                        self.cur_state = 3;
+                        self.destination_pos = {[-0.4,0,1.5];[-0.4,0,1.5];[-0.4,0,1.5];[0,0.3,1.6]};
+                        self.handles.pb4.String ="Pork Can!";
+                end
+                self.handles.pb5.Color = 'g';
+                self.ProcessingWork
             end
 
             % Open the control GUI for the robot UR3
