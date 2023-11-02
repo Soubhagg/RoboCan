@@ -403,7 +403,7 @@ classdef Assignment2 < handle
         % the system source.
 
         function RunGUI(self)
-            self.handles.fig = uifigure('Name','Can-Can Robot','position',[80 250 524 472]);
+            self.handles.fig = uifigure('Name','Can-Can Robot','position',[80 250 524 472],'KeyPressFcn',@keyboard);
             self.handles.pb0 = uiswitch(self.handles.fig,'toggle','Position',[45 385 20 45],'Items',{'Off','On'},'Value',0,'ValueChangedFcn',@login_cb,'ItemsData',{0,1});
             self.handles.pb1 = uicontrol(self.handles.fig,'style','togglebutton','position',[350 179 158 91],'callback',@stop_cb,'string','Stop','BackgroundColor',[1 0 0]);
             self.handles.pb2 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 249 108 41],'callback',@resume_cb,'string','Run');
@@ -417,8 +417,21 @@ classdef Assignment2 < handle
             self.handles.pb10 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 49 108 41],'callback',@nutrition_cb,'string','Nutritional Info');
 
             guidata(self.handles.fig,self.handles);
+            
+            function keyboard(~,event)
+                switch event.Key
+                    case 'q'
+                        logout_cb
+                    case 's'
+                        self.handles.pb1.Value = 1;
+                        stop_cb
+                    case 'r'
+                        self.handles.pb1.Value = 0;
+                        stop_cb
+                end
+            end
 
-            function nutrition_cb(src,~)
+            function nutrition_cb(~,~)
                 canInfo = imread("131559_2.jpg");
 
                 try
@@ -510,8 +523,7 @@ classdef Assignment2 < handle
             end
 
             % Stop function sends signal to the system if being pushed
-            function stop_cb(src,~)
-                self.handles = guidata(src);
+            function stop_cb(~,~)
                 self.stop_signal = self.handles.pb1.Value;
                 % Send true signal if being pressed. Change the system
                 % status to stop stage.
