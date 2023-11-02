@@ -312,6 +312,7 @@ classdef Assignment2 < handle
                         result = result + 1;
                     end
                 end
+
             end
         end
         %% Gripper Control
