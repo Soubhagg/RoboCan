@@ -110,8 +110,8 @@ classdef Assignment2 < handle
             fireExtLocation = [1.7,0.25,1.5];
             fireExtPlacement = PlaceObject('fireExtinguisher.ply',fireExtLocation);
 
-            self.object_pos = {[0.4,0.3,1.5];[0.5,0,1.5];[0.35,0.2,1.5]};
-            objectCap_pos = {[0.4,0.3,1.66];[0.5,0,1.66];[0.35,0.2,1.66]};
+            self.object_pos = {[0.35,0.3,1.5];[0.5,0,1.5];[0.35,-0.2,1.5]};
+            objectCap_pos = {[0.35,0.3,1.66];[0.5,0,1.66];[0.35,-0.2,1.66]};
             for index = 1: size(self.object_pos,1)
                 self.Can{index} = PlaceObject('Canbody.ply');
                 self.Can_vert{index} = get(self.Can{index},'Vertices');
@@ -312,6 +312,7 @@ classdef Assignment2 < handle
                         result = result + 1;
                     end
                 end
+
             end
         end
         %% Gripper Control
@@ -405,17 +406,112 @@ classdef Assignment2 < handle
             self.handles.fig = uifigure('Name','Can-Can Robot','position',[80 250 524 472]);
             self.handles.pb0 = uiswitch(self.handles.fig,'toggle','Position',[45 385 20 45],'Items',{'Off','On'},'Value',0,'ValueChangedFcn',@login_cb,'ItemsData',{0,1});
             self.handles.pb1 = uicontrol(self.handles.fig,'style','togglebutton','position',[350 179 158 91],'callback',@stop_cb,'string','Stop','BackgroundColor',[1 0 0]);
-            self.handles.pb2 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 249 108 41],'callback',@resume_cb,'string','Run');
+            self.handles.pb2 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 249 108 41],'callback',@resume_cb,'string','Run','KeyPressFcn',@test);
             self.handles.pb3 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 179 108 41],'callback',@logout_cb,'string','Log out');
             self.handles.pb4 = uicontrol(self.handles.fig,'style','edit','position',[111 333 304 118],'HorizontalAlignment','center','FontSize',14,'Value',1,'BackgroundColor','k');
             self.handles.pb5 = uilamp(self.handles.fig,'Color','r','Position',[449 405 46 46]);
             self.handles.pb6 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 109 108 41],'callback',@control_cb,'string','Control Mode');
-            self.handles.pb7 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 249 108 41],'callback',@options,'string','Coca','Tag','c');
-            self.handles.pb8 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 179 108 41],'callback',@options,'string','Sprite','Tag','s');
-            self.handles.pb9 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 109 108 41],'callback',@options,'string','Water','Tag','w');
+            self.handles.pb7 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 249 108 41],'callback',@options,'string','Fish','Tag','f','BackgroundColor',[0.56,0.02,0.02]);
+            self.handles.pb8 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 179 108 41],'callback',@options,'string','Beef','Tag','b','BackgroundColor',[0.20,0.93,0.98]);
+            self.handles.pb9 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 109 108 41],'callback',@options,'string','Pork','Tag','p','BackgroundColor',[0.87,0.90,0.90]);
+            self.handles.pb10 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 49 108 41],'callback',@nutrition_cb,'string','Nutritional Info');
 
             guidata(self.handles.fig,self.handles);
             
+            function test(src,event)
+            fstr
+            end
+            function nutrition_cb(src,~)
+                canInfo = imread("131559_2.jpg");
+
+                try
+                    imageInfo = ocr(canInfo);
+                    recognizedText = imageInfo.Text;
+                catch
+                    recognizedText = 'Text not recognized';
+                end
+                
+                % Display the image and recognized text
+                figure
+                imshow(canInfo)
+                
+                % Initialize variables to store nutritional information
+                servSize = '';
+                energy = '';
+                protein = '';
+                fat = '';
+                carbs = '';
+                sugars = '';
+                sodium = '';
+                
+                % Define regular expressions to capture nutritional information
+                servSizePattern = 'Serving size:\s*([\d.]+\s*[a-zA-Z]+)';
+                energyPattern = 'Energy\s*([\d.]+[a-zA-Z]+)\s*\((\d+\s*Cal)\)';
+                proteinPattern = 'Protein[^0-9]*([\d.]+[a-zA-Z]*)';
+                fatPattern = 'Fat[^0-9]*([\d.]+[a-zA-Z]*)';
+                carbsPattern = 'Carbohydrate[^0-9]*([\d.]+)\s*([a-zA-Z]*)';
+                sugarsPattern = 'Sugars[^0-9]*([\d.]+[a-zA-Z]+)';
+                sodiumPattern = 'Sodium\s*([\d.]+)\s*(mg)';
+                
+                % Match the regular expressions and extract the data
+                servSizeMatch = regexp(recognizedText, servSizePattern, 'tokens');
+                energyMatch = regexp(recognizedText, energyPattern, 'tokens');
+                proteinMatch = regexp(recognizedText, proteinPattern, 'tokens');
+                fatMatch = regexp(recognizedText, fatPattern, 'tokens');
+                carbsMatch = regexp(recognizedText, carbsPattern, 'tokens');
+                sugarsMatch = regexp(recognizedText, sugarsPattern, 'tokens');
+                sodiumMatch = regexp(recognizedText, sodiumPattern, 'tokens');
+                
+                % Extract the matched values
+                if ~isempty(servSizeMatch)
+                    servSize = servSizeMatch{1};
+                end
+                
+                if ~isempty(energyMatch)
+                    energy = energyMatch{1};
+                end
+                
+                if ~isempty(proteinMatch)
+                    protein = proteinMatch{1};
+                end
+                
+                if ~isempty(fatMatch)
+                    fat = fatMatch{1};
+                end
+                
+                if ~isempty(carbsMatch)
+                    carbsValue = carbsMatch{1}{1};
+                    carbsUnit = carbsMatch{1}{2};
+                    % If the unit is empty, set it to "g" (grams)
+                    if isempty(carbsUnit)
+                        carbsUnit = 'g';
+                    end
+                    % Append the unit to the value
+                    carbs = carbsValue + " " + carbsUnit;
+                else
+                    % If no carbohydrate information is found, set it to "Not available"
+                    carbs = 'Not available';
+                end
+                
+                if ~isempty(sugarsMatch)
+                    sugars = sugarsMatch{1};
+                end
+                
+                if ~isempty(sodiumMatch)
+                    sodium = sodiumMatch{1};
+                end
+                
+                % Display the extracted information
+                % Display the extracted information in the desired format
+                disp(['Serving Size: ' servSize{1}]);
+                disp(['Energy: ' energy{1} ' ' energy{2}]);
+                disp(['Protein: ' protein{1}]);
+                disp(['Fat: ' fat{1}]);
+                disp(['Carbohydrates: ' carbs{1}]);
+                disp(['Sugars: ' sugars{1}]);
+                disp(['Sodium: ' sodium{1}]);
+            end
+
             % Stop function sends signal to the system if being pushed
             function stop_cb(src,~)
                 self.handles = guidata(src);
@@ -473,7 +569,7 @@ classdef Assignment2 < handle
                     self.RightHand = GripperHand(GripperHand2);
                     self.Add_models
                     self.destination_pos = {[-0.4,0,1.5];[-0.4,0,1.5];[-0.4,0,1.5];[0,0.3,1.6]};
-                    self.handles.pb4.String ="Press The Run Button To Start";
+                    self.handles.pb4.String ="Hi!What would you like to eat?";
                     pause(2)
                 else
                     logout_cb
@@ -485,21 +581,25 @@ classdef Assignment2 < handle
                     close(self.handles.fig)
                 end
             end
-            
+
             %Change the destination location based on option
             function options(src,~)
                 self.cur_step = 1;
-                if strcmp()
-                    self.cur_state = 1;
-                    self.destination_pos = {[-0.4,0,1.5];[0,0.3,1.6]};
-                elseif self.handles.pb8.Value
-                    self.cur_state = 2;
-                    self.destination_pos = {[-0.4,0,1.5];[-0.4,0,1.5];[0,0.3,1.6]};
-                elseif self.handles.pb9.Value
-                    self.cur_state = 3;
-                    self.destination_pos = {[-0.4,0,1.5];[-0.4,0,1.5];[-0.4,0,1.5];[0,0.3,1.6]};
+                switch src.Tag
+                    case char('f')
+                        self.cur_state = 1;
+                        self.destination_pos = {[-0.4,0,1.5];[0,0.3,1.6]};
+                        self.handles.pb4.String ="Fish Can!";
+                    case char('b')
+                        self.cur_state = 2;
+                        self.destination_pos = {[-0.4,0,1.5];[-0.4,0,1.5];[0,0.3,1.6]};
+                        self.handles.pb4.String ="Beef Can!";
+                    case char('p')
+                        self.cur_state = 3;
+                        self.destination_pos = {[-0.4,0,1.5];[-0.4,0,1.5];[-0.4,0,1.5];[0,0.3,1.6]};
+                        self.handles.pb4.String ="Pork Can!";
                 end
-                self.cur_state
+                self.handles.pb5.Color = 'g';
                 self.ProcessingWork
             end
 
