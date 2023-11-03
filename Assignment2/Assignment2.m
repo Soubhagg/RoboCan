@@ -13,6 +13,7 @@ classdef Assignment2 < handle
         handles;                                                           % Information Storage for the GUI
         cur_state;cur_step;                                                % Indicate the current stage and step
         smart_feature;                                                     % Develop feature (not User Friendly) - Used to enhance the smooth and precise of the robot movement
+        objectPlacement;
     end
     methods (Access = public)
         %% Open the GUI for the system
@@ -440,13 +441,13 @@ classdef Assignment2 < handle
 
                     function objectManage() 
                         if switch_state == 1
-                            objectPlacement = PlaceObject('fireExtinguisher.ply', objectLocation);
+                            self.objectPlacement = PlaceObject('fireExtinguisher.ply', objectLocation);
                         else
                             try
-                                delete(objectPlacement)
+                                delete(self.objectPlacement)
                             catch 
                                 self.handles.pb4.String = 'No object to delete';
-                            end 
+                            end
                         end
                     end
                    
