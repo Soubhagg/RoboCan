@@ -412,9 +412,9 @@ classdef Assignment2 < handle
             self.handles.pb4 = uicontrol(self.handles.fig,'style','edit','position',[111 333 304 118],'HorizontalAlignment','center','FontSize',14,'Value',1,'BackgroundColor','k');
             self.handles.pb5 = uilamp(self.handles.fig,'Color','r','Position',[449 405 46 46]);
             self.handles.pb6 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 49 108 41],'callback',@control_UR3,'string','Control UR3');
-            self.handles.pb7 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 249 108 41],'callback',@options,'string','Fish','Tag','f','BackgroundColor',[0.56,0.02,0.02]);
-            self.handles.pb8 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 179 108 41],'callback',@options,'string','Beef','Tag','b','BackgroundColor',[0.20,0.93,0.98]);
-            self.handles.pb9 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 109 108 41],'callback',@options,'string','Pork','Tag','p','BackgroundColor',[0.87,0.90,0.90]);
+            self.handles.pb7 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 249 108 41],'callback',@options,'string','Tomato','Tag','f','BackgroundColor',[0.56,0.02,0.02]);
+            self.handles.pb8 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 179 108 41],'callback',@options,'string','Condensed Milk','Tag','b','BackgroundColor',[0.20,0.93,0.98]);
+            self.handles.pb9 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 109 108 41],'callback',@options,'string','Coconut Milk','Tag','p','BackgroundColor',[0.87,0.90,0.90]);
             self.handles.pb10 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 109 108 41],'callback',@nutrition_cb,'string','Nutritional Info');
             self.handles.pb11 = uiswitch(self.handles.fig, 'toggle','Position',[420 50 108 41], 'Items', {'No Collision','Collision'},'Value',0,'ValueChangedFcn', @collision_cb,'ItemsData',{0,1});
             self.handles.pb12 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 49 108 41],'callback',@control_Kuka,'string','Control KUKA');
@@ -476,7 +476,7 @@ classdef Assignment2 < handle
             function nutrition_cb(~,~)
             
             self.handles.fig3 = uifigure('Name','Nutrition Selection','position',[77 250 524 472]);
-            self.handles.sb1 = uicontrol(self.handles.fig3,'style','pushbutton','position',[35 269 108 41],'callback',@nut1_cb,'string','Nutirtion 1');
+            self.handles.sb1 = uicontrol(self.handles.fig3,'style','pushbutton','position',[35 269 108 41],'callback',@nut1_cb,'string','Nutrition 1');
             self.handles.sb2 = uicontrol(self.handles.fig3,'style','pushbutton','position',[35 199 108 41],'callback',@nut2_cb,'string','Nutrition 2');
             self.handles.sb3 = uicontrol(self.handles.fig3,'style','pushbutton','position',[35 129 108 41],'callback',@nut3_cb,'string','Nutrition 3');
             
@@ -564,6 +564,7 @@ classdef Assignment2 < handle
                 end
                 
                 % Display the extracted information
+                disp('Can 1: Tomatoes');
                 disp(['Serving Size: ' servSize{1}]);
                 disp(['Energy: ' energy{1} ' ' energy{2}]);
                 disp(['Protein: ' protein{1}]);
@@ -669,6 +670,7 @@ classdef Assignment2 < handle
                 end
                 
                 % Display the extracted information
+                disp('Can 2: Condensed Milk');
                 disp(['Serving Size: ' servSize{1}]);
                 disp(['Energy: ' energy{1} ' ' energy{2}]);
                 disp(['Protein: ' protein{1}]);
@@ -765,6 +767,7 @@ classdef Assignment2 < handle
                 end
                 
                 % Display the extracted information
+                disp('Can 3: Coconut Milk');
                 disp(['Serving Size: ' servSize{1}]);
                 disp(['Energy: ' energy]);
                 disp(['Protein: ' protein{1}]);
@@ -850,15 +853,15 @@ classdef Assignment2 < handle
                     case char('f')
                         self.cur_state = 1;
                         self.destination_pos = {[-0.4,0,1.5];[0,0.3,1.6]};
-                        self.handles.pb4.String ="Fish Can!";
+                        self.handles.pb4.String ="Tomato Can!";
                     case char('b')
                         self.cur_state = 2;
                         self.destination_pos = {[-0.4,0,1.5];[-0.4,0,1.5];[0,0.3,1.6]};
-                        self.handles.pb4.String ="Beef Can!";
+                        self.handles.pb4.String ="Condensed Milk Can!";
                     case char('p')
                         self.cur_state = 3;
                         self.destination_pos = {[-0.4,0,1.5];[-0.4,0,1.5];[-0.4,0,1.5];[0,0.3,1.6]};
-                        self.handles.pb4.String ="Pork Can!";
+                        self.handles.pb4.String ="Coconut Milk Can!";
                 end
                 self.handles.pb5.Color = 'g';
                 self.ProcessingWork
