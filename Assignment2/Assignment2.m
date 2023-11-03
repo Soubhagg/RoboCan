@@ -574,7 +574,7 @@ classdef Assignment2 < handle
             end
                         function nut2_cb(~,~)
 
-                canInfo = imread("131559_2.jpg");
+                canInfo = imread("861611_3.jpg");
 
                 try
                     imageInfo = ocr(canInfo);
@@ -597,13 +597,13 @@ classdef Assignment2 < handle
                 sodium = '';
                 
                 % Define regular expressions to capture nutritional information
-                servSizePattern = 'Serving size:\s*([\d.]+\s*[a-zA-Z]+)';
-                energyPattern = 'Energy\s*([\d.]+[a-zA-Z]+)\s*\((\d+\s*Cal)\)';
-                proteinPattern = 'Protein[^0-9]*([\d.]+[a-zA-Z]*)';
-                fatPattern = 'Fat[^0-9]*([\d.]+[a-zA-Z]*)';
-                carbsPattern = 'Carbohydrate[^0-9]*([\d.]+)\s*([a-zA-Z]*)';
-                sugarsPattern = 'Sugars[^0-9]*([\d.]+[a-zA-Z]+)';
-                sodiumPattern = 'Sodium\s*([\d.]+)\s*(mg)';
+                servSizePattern = 'SERVING SIZE:\s*([\d.]+\s*[a-zA-Z]+)';
+                energyPattern = 'ENERGY\s*([\d.]+)\s*(kJ)';
+                proteinPattern = 'PROTEIN\s*([\d.]+[a-zA-Z]*)';
+                fatPattern = 'FAT,\s*TOTAL\s*([\d.]+)\s*([a-zA-Z]*)';
+                carbsPattern = 'CARBOHYDRATE,\s*TOTAL\s*([\d.]+)\s*([a-zA-Z]*)';
+                sugarsPattern = 'SUGARS\s*([\d.]+[a-zA-Z]*)';
+                sodiumPattern = 'SODIUM\s*([\d.]+)\s*(mg)';
                 
                 % Match the regular expressions and extract the data
                 servSizeMatch = regexp(recognizedText, servSizePattern, 'tokens');
@@ -620,7 +620,11 @@ classdef Assignment2 < handle
                 end
                 
                 if ~isempty(energyMatch)
-                    energy = energyMatch{1};
+                    energyValue = energyMatch{1};
+                    energy = energyValue;
+                else
+                    % If no energy information is found, set it to "Not available"
+                    energy = 'Not available';
                 end
                 
                 if ~isempty(proteinMatch)
@@ -628,18 +632,29 @@ classdef Assignment2 < handle
                 end
                 
                 if ~isempty(fatMatch)
-                    fat = fatMatch{1};
+                    fatValue = fatMatch{1}{1};
+                    fatUnit = fatMatch{1}{2};
+                    
+                    if isempty(fatUnit)
+                        fatUnit = 'g';
+                    end
+                
+                    % Convert fat value to a decimal and display in grams
+                    fatValueInGrams = str2double(fatValue) / 100;
+                    fat = sprintf('%.1fg', fatValueInGrams);
+                else
+                    % If no fat information is found, set it to "Not available"
+                    fat = 'Not available';
                 end
                 
                 if ~isempty(carbsMatch)
                     carbsValue = carbsMatch{1}{1};
                     carbsUnit = carbsMatch{1}{2};
-                    % If the unit is empty, set it to "g" (grams)
                     if isempty(carbsUnit)
-                        carbsUnit = 'g';
+                        carbsUnit = 'g';  % If the unit is not available, set it to 'g'
                     end
-                    % Append the unit to the value
-                    carbs = carbsValue + " " + carbsUnit;
+                    % Concatenate the unit to the value
+                    carbs = [carbsValue ' ' carbsUnit];
                 else
                     % If no carbohydrate information is found, set it to "Not available"
                     carbs = 'Not available';
@@ -657,14 +672,14 @@ classdef Assignment2 < handle
                 disp(['Serving Size: ' servSize{1}]);
                 disp(['Energy: ' energy{1} ' ' energy{2}]);
                 disp(['Protein: ' protein{1}]);
-                disp(['Fat: ' fat{1}]);
-                disp(['Carbohydrates: ' carbs{1}]);
+                disp(['Fat: ' fat]);
+                disp(['Carbohydrates: ' carbs]);
                 disp(['Sugars: ' sugars{1}]);
-                disp(['Sodium: ' sodium{1}]);
+                disp(['Sodium: ' sodium{1} ' ' sodium{2}]);
                         end
             function nut3_cb(~,~)
 
-                canInfo = imread("131559_2.jpg");
+                canInfo = imread("057198_2.jpg");
 
                 try
                     imageInfo = ocr(canInfo);
@@ -688,7 +703,7 @@ classdef Assignment2 < handle
                 
                 % Define regular expressions to capture nutritional information
                 servSizePattern = 'Serving size:\s*([\d.]+\s*[a-zA-Z]+)';
-                energyPattern = 'Energy\s*([\d.]+[a-zA-Z]+)\s*\((\d+\s*Cal)\)';
+                energyPattern = 'Energy:\s*([\d.]+)\s*(kJ)';
                 proteinPattern = 'Protein[^0-9]*([\d.]+[a-zA-Z]*)';
                 fatPattern = 'Fat[^0-9]*([\d.]+[a-zA-Z]*)';
                 carbsPattern = 'Carbohydrate[^0-9]*([\d.]+)\s*([a-zA-Z]*)';
@@ -710,8 +725,14 @@ classdef Assignment2 < handle
                 end
                 
                 if ~isempty(energyMatch)
-                    energy = energyMatch{1};
+                    energyValue = energyMatch{1}{1};
+                    energyUnit = energyMatch{1}{2};
+                    energy = energyValue + " " + energyUnit;
+                else
+                    % If no energy information is found, set it to "Not available"
+                    energy = 'Not available';
                 end
+                
                 
                 if ~isempty(proteinMatch)
                     protein = proteinMatch{1};
@@ -745,7 +766,7 @@ classdef Assignment2 < handle
                 
                 % Display the extracted information
                 disp(['Serving Size: ' servSize{1}]);
-                disp(['Energy: ' energy{1} ' ' energy{2}]);
+                disp(['Energy: ' energy]);
                 disp(['Protein: ' protein{1}]);
                 disp(['Fat: ' fat{1}]);
                 disp(['Carbohydrates: ' carbs{1}]);

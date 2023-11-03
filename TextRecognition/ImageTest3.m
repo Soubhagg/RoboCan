@@ -57,7 +57,6 @@ if ~isempty(servSizeMatch)
     servSize = servSizeMatch{1};
 end
 
-% Extract the matched values
 if ~isempty(energyMatch)
     energyValue = energyMatch{1}{1};
     energyUnit = energyMatch{1}{2};
