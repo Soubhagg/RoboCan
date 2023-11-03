@@ -478,9 +478,9 @@ classdef Assignment2 < handle
             function nutrition_cb(~,~)
             
             self.handles.fig3 = uifigure('Name','Nutrition Selection','position',[77 250 524 472]);
-            self.handles.sb1 = uicontrol(self.handles.fig3,'style','pushbutton','position',[35 269 108 41],'callback',@nut1_cb,'string','Nutrition 1');
-            self.handles.sb2 = uicontrol(self.handles.fig3,'style','pushbutton','position',[35 199 108 41],'callback',@nut2_cb,'string','Nutrition 2');
-            self.handles.sb3 = uicontrol(self.handles.fig3,'style','pushbutton','position',[35 129 108 41],'callback',@nut3_cb,'string','Nutrition 3');
+            self.handles.sb1 = uicontrol(self.handles.fig3,'style','pushbutton','position',[35 269 108 41],'callback',@nut1_cb,'string','Can 1');
+            self.handles.sb2 = uicontrol(self.handles.fig3,'style','pushbutton','position',[35 199 108 41],'callback',@nut2_cb,'string','Can 2');
+            self.handles.sb3 = uicontrol(self.handles.fig3,'style','pushbutton','position',[35 129 108 41],'callback',@nut3_cb,'string','Can 3');
             
             end
 
