@@ -411,13 +411,13 @@ classdef Assignment2 < handle
             self.handles.pb3 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 179 108 41],'callback',@logout_cb,'string','Log out');
             self.handles.pb4 = uicontrol(self.handles.fig,'style','edit','position',[111 333 304 118],'HorizontalAlignment','center','FontSize',14,'Value',1,'BackgroundColor','k');
             self.handles.pb5 = uilamp(self.handles.fig,'Color','r','Position',[449 405 46 46]);
-            self.handles.pb6 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 109 108 41],'callback',@control_UR3,'string','Control Mode');
+            self.handles.pb6 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 49 108 41],'callback',@control_UR3,'string','Control UR3');
             self.handles.pb7 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 249 108 41],'callback',@options,'string','Fish','Tag','f','BackgroundColor',[0.56,0.02,0.02]);
             self.handles.pb8 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 179 108 41],'callback',@options,'string','Beef','Tag','b','BackgroundColor',[0.20,0.93,0.98]);
             self.handles.pb9 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 109 108 41],'callback',@options,'string','Pork','Tag','p','BackgroundColor',[0.87,0.90,0.90]);
-            self.handles.pb10 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 49 108 41],'callback',@nutrition_cb,'string','Nutritional Info');
+            self.handles.pb10 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 109 108 41],'callback',@nutrition_cb,'string','Nutritional Info');
             self.handles.pb11 = uiswitch(self.handles.fig, 'toggle','Position',[420 50 108 41], 'Items', {'No Collision','Collision'},'Value',0,'ValueChangedFcn', @collision_cb,'ItemsData',{0,1});
-            self.handles.pb12 = uicontrol(self.handles.fig,'style','pushbutton','position',[178 39 108 41],'callback',@control_Kuka,'string','Control Kuka');
+            self.handles.pb12 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 49 108 41],'callback',@control_Kuka,'string','Control KUKA');
 
             guidata(self.handles.fig,self.handles);
             
