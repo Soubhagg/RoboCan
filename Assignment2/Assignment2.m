@@ -833,18 +833,35 @@ classdef Assignment2 < handle
 
             function updatepose3_cb(~, ~)
             % Get the joint angle values from the sliders
-            joint1 = self.handles.sb1.Value;
-            joint2 = self.handles.sb2.Value;
-            joint3 = self.handles.sb3.Value;
-            joint4 = self.handles.sb4.Value;
-            joint5 = self.handles.sb5.Value;
-            joint6 = self.handles.sb6.Value;
-        
-             % Set the joint angles for the robot (assuming 'robot2' represents the KUKA KR3 R540)
-             q_end = [joint1, joint2, joint3, joint4, joint5, joint6];
-    
-            % Update the robot's joint angles
-            self.robot2.model.animate(q_end);
+    joint1 = self.handles.sb1.Value;
+    joint2 = self.handles.sb2.Value;
+    joint3 = self.handles.sb3.Value;
+    joint4 = self.handles.sb4.Value;
+    joint5 = self.handles.sb5.Value;
+    joint6 = self.handles.sb6.Value;
+
+    % Set the joint angles for the robot (assuming 'robot2' represents the KUKA KR3 R540)
+    q_end = [joint1, joint2, joint3, joint4, joint5, joint6];
+
+    % Get the current joint angles
+    q_start = self.robot2.model.getpos();
+
+    % Define the duration of the movement (in seconds)
+    movement_duration = 2.0;  % Adjust this value as needed
+
+    % Calculate the number of steps for interpolation
+    num_steps = 100;  % You can adjust this value for smoother or faster movement
+
+    % Interpolate between the current and desired joint angles
+    for t = linspace(0, 1, num_steps)
+        interpolated_q = q_start + t * (q_end - q_start);
+
+        % Update the robot's joint angles
+        self.robot2.model.animate(interpolated_q);
+
+        % Pause for a short time to control the movement speed
+        pause(movement_duration / num_steps);
+    end
 
              % Update UI Values
             cur_pos = self.robot2.model.fkine(self.robot2.model.getpos).T;
