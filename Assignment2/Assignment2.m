@@ -415,8 +415,49 @@ classdef Assignment2 < handle
             self.handles.pb8 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 179 108 41],'callback',@options,'string','Beef','Tag','b','BackgroundColor',[0.20,0.93,0.98]);
             self.handles.pb9 = uicontrol(self.handles.fig,'style','pushbutton','position',[150 109 108 41],'callback',@options,'string','Pork','Tag','p','BackgroundColor',[0.87,0.90,0.90]);
             self.handles.pb10 = uicontrol(self.handles.fig,'style','pushbutton','position',[35 49 108 41],'callback',@nutrition_cb,'string','Nutritional Info');
+            self.handles.pb11 = uiswitch(self.handles.fig, 'toggle','Position',[420 50 108 41], 'Items', {'No Collision','Collision'},'Value',0,'ValueChangedFcn', @collision_cb,'ItemsData',{0,1});
 
             guidata(self.handles.fig,self.handles);
+
+
+ 	        function collision_cb(src, ~)
+                    objectLocation = [-0.5, 0.25, 1.5];
+                    self.handles = guidata(src);
+                    switch_state = self.handles.pb11.Value;
+
+                    function objectManage() 
+                        if switch_state == 1
+                            objectPlacement = PlaceObject('fireExtinguisher.ply', objectLocation);
+                        else
+                            try
+                                delete(objectPlacement)
+                            catch 
+                                self.handles.pb4.String = 'No object to delete';
+                            end 
+                        end
+                    end
+                   
+                    
+                    % Toggle collision signal
+                    if switch_state == 0 
+                        self.collision_signal = 0; % Turn off collision detection
+                        objectManage();
+                    else
+                        self.collision_signal = 1; % Turn on collision detection
+                        objectManage();
+                    end
+                
+                    if self.collision_signal == 1
+                        % Notify user or system about collision activation
+                        self.handles.pb4.String = "Collision Activated!";
+                        self.handles.pb5.Color = 'r'; % Setting color to red
+                    else if self.collision_signal == 0
+                        % Notify user or system about collision deactivation
+                        % self.handles.pb4.String = "Removing Object!";
+                        self.handles.pb5.Color = 'y'; % Setting color to yellow
+                    end
+                    end
+            end
 
             function nutrition_cb(src,~)
                 canInfo = imread("131559_2.jpg");
@@ -499,7 +540,6 @@ classdef Assignment2 < handle
                 end
                 
                 % Display the extracted information
-                % Display the extracted information in the desired format
                 disp(['Serving Size: ' servSize{1}]);
                 disp(['Energy: ' energy{1} ' ' energy{2}]);
                 disp(['Protein: ' protein{1}]);
