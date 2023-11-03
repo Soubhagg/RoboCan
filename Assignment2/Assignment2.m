@@ -431,6 +431,8 @@ classdef Assignment2 < handle
                     case 'r'
                         self.handles.pb1.Value = 0;
                         stop_cb
+                    case 'v'
+                        VRcontrol();
                 end
             end
 
@@ -918,7 +920,7 @@ classdef Assignment2 < handle
                 self.handles.lb10 = uilabel(self.handles.fig2,"Position",[424 153 17 22],"Text",'R',"HorizontalAlignment",'center');
                 self.handles.lb11 = uilabel(self.handles.fig2,"Position",[424 88 17 22],"Text",'P',"HorizontalAlignment",'center');
                 self.handles.lb12 = uilabel(self.handles.fig2,"Position",[424 23 17 22],"Text",'Y',"HorizontalAlignment",'center');
-                % VRcontrol();
+                
             end
 
              function control_Kuka(~,~)
@@ -1095,10 +1097,14 @@ classdef Assignment2 < handle
                 q = self.robot.model.getpos;
                 id = 1; % Note: may need to be changed if multiple joysticks present
                 joy = vrjoystick(id);
-                dt = 0.05;      % Set time step for simulation (seconds)
+                dt = 0.1;      % Set time step for simulation (seconds)
 
                 n = 0;  % Initialise step count to zero
                 tic;    % recording simulation start time
+                self.LeftHand.model.delay = 0;
+                self.RightHand.model.delay = 0;
+                self.robot.model.delay = 0;
+                self.GripperBase0.model.delay = 0;
                 while 1
                     n=n+1; % increment step count
 
@@ -1116,7 +1122,7 @@ classdef Assignment2 < handle
                     vz = K*axes(4);
                     wz = K*(buttons(6)-buttons(5));
                     % 2 - use J inverse to calculate joint velocity
-                    J = self.robot.jacobe(q);
+                    J = self.robot.model.jacobe(q);
                     V_end_effector = [vx;vy;vz;wx;wy;wz];
                     lamda = 0.01;
 
@@ -1127,7 +1133,21 @@ classdef Assignment2 < handle
                     % -------------------------------------------------------------
 
                     % Update plot
-                    self.robot.animate(q);
+
+                    self.GripperBase0.model.base = self.robot.model.fkine(self.robot.model.getpos).T*transl(0,0,-0.01)*troty(pi);
+                    self.LeftHand.model.base = self.GripperBase0.model.base.T*transl(0,0.015,-0.06)*troty(pi/2);
+                    self.RightHand.model.base = self.GripperBase0.model.base.T*trotz(pi)*transl(0,0.015,-0.06)*troty(pi/2);
+                    
+
+                    % Moving the Gripper along with the robot.
+                    self.robot.model.animate(q);
+                    self.GripperBase0.model.animate(0);
+                    self.LeftHand.model.animate(self.LeftHand.model.getpos);
+                    self.RightHand.model.animate(self.RightHand.model.getpos);
+                    
+                    
+                    
+                    drawnow
 
                     % wait until loop time elapsed
                     if (toc > dt*n)
